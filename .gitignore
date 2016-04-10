@@ -4,6 +4,7 @@
 target
 
 *.class
+*.lock
 *.log
 *.log.gz
 *.swp
