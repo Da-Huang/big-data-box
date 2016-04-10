@@ -5,4 +5,5 @@ target
 
 *.class
 *.log
+*.log.gz
 *.swp
