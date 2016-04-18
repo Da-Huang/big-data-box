@@ -1,19 +1,26 @@
 package sewm.bdbox.search;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-
+import java.net.URL;
 import java.nio.file.Files;
-
+import java.nio.file.OpenOption;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.Locale;
+import java.util.Map.Entry;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mozilla.universalchardet.UniversalDetector;
+import org.tukaani.xz.SeekableFileInputStream;
+import org.tukaani.xz.SeekableInputStream;
 
 import sewm.bdbox.util.ExceptionUtil;
 import sewm.bdbox.util.HtmlUtil;
@@ -23,9 +30,10 @@ import sewm.bdbox.util.StreamUtil;
 public class InfomallDocumentIterator {
   private static Logger logger = LogManager
       .getLogger(InfomallDocumentIterator.class);
-  private InputStream is;
+  private SeekableInputStream is;
+  private UniversalDetector detector = new UniversalDetector(null);
 
-  public InfomallDocumentIterator(InputStream is) {
+  public InfomallDocumentIterator(SeekableInputStream is) {
     this.is = is;
   }
 
@@ -37,7 +45,9 @@ public class InfomallDocumentIterator {
     Integer unzipLength = null;
     Integer length = null;
     String data = null;
+    Long position;
     try {
+      position = is.position();
       String line;
       while ((line = StreamUtil.readLine(is)) != null && !line.isEmpty()) {
         // logger.info(line);
@@ -92,14 +102,20 @@ public class InfomallDocumentIterator {
       // TODO unzip
       byte[] unzipBytes = JZlipUtil.decompress(bytes);
       data = new String(unzipBytes);
+      Files.write(Paths.get("test.html"), unzipBytes);
 
-      String charset = HtmlUtil.pCharset(data);
-      if (!charset.equals("utf8") && !charset.equals("utf-8"))
-        data = new String(unzipBytes, charset);
-
-      Files.write(Paths.get("hello.txt"), data.getBytes());
-
-      InfomallDocument doc = new InfomallDocument(version, url, date, data);
+      String charset = HtmlUtil.pCharset(detector, unzipBytes);
+//      logger.info(charset);
+      //charset = "gb18030";
+      data = new String(unzipBytes, charset);
+//      Entry<String, String> data_charset = HtmlUtil.decode(unzipBytes, Arrays.asList("utf8", "gb18030"));
+//      data = data_charset.getKey();
+//      charset = data_charset.getValue();
+      
+      String title = HtmlUtil.parseTitle(data);
+      String content = HtmlUtil.parseContent(data);
+      InfomallDocument doc = new InfomallDocument(version, url, date, data,
+          position, charset, title,content);
       return doc;
     } catch (IOException e) {
       // TODO Auto-generated catch block
@@ -120,15 +136,26 @@ public class InfomallDocumentIterator {
     return null;
   }
 
-  public static void main(String[] args) throws IOException {
+  public static void main(String[] args) {
 
-    InfomallDocumentIterator iter = new InfomallDocumentIterator(
-        Files.newInputStream(Paths.get("F:/U200201/Web_Raw.U200201.0001")));
-    InfomallDocument doc;
-    int i = 0;
-    while ((doc = iter.next()) != null) {
-       logger.info(++i + ": " + doc.url);
-      // return;
+    try (SeekableInputStream is = new SeekableFileInputStream(new File(
+        "F:/U200201/Web_Raw.U200201.0001"))) {
+      //is.seek(682210);
+      InfomallDocumentIterator iter = new InfomallDocumentIterator(is);
+      InfomallDocument doc;
+      int i = 0;
+      while ((doc = iter.next()) != null) {
+        // logger.info(++i + ": " + doc.url);
+        // logger.info(doc.url);
+        logger.info(doc.position);
+        logger.info(doc.charset);
+        logger.info(doc.title);
+        logger.info(doc.content);
+        // logger.info(doc.data);
+        // return;
+      }
+    } catch (IOException e) {
+      logger.error(ExceptionUtil.getStacktraceString(e));
     }
   }
 }
