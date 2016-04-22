@@ -11,7 +11,12 @@ public class InfomallDocument {
   String charset;
   String title;
   String content;
-  public InfomallDocument(String version, String url, Date date, String data,Long position,String charset,String title,String content) {
+  String path;
+  String host;
+
+  public InfomallDocument(String version, String url, Date date, String data,
+      Long position, String charset, String title, String content, String path,
+      String host) {
     this.version = version;
     this.url = url;
     this.date = date;
@@ -20,6 +25,7 @@ public class InfomallDocument {
     this.charset = charset;
     this.title = title;
     this.content = content;
+    this.path = path;
+    this.host = host;
   }
-
 }
