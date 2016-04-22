@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -31,10 +32,12 @@ public class InfomallDocumentIterator {
   private static Logger logger = LogManager
       .getLogger(InfomallDocumentIterator.class);
   private SeekableInputStream is;
+  private String path;
   private UniversalDetector detector = new UniversalDetector(null);
 
-  public InfomallDocumentIterator(SeekableInputStream is) {
+  public InfomallDocumentIterator(SeekableInputStream is, String file) {
     this.is = is;
+    this.path = file;
   }
 
   public InfomallDocument next() {
@@ -50,7 +53,6 @@ public class InfomallDocumentIterator {
       position = is.position();
       String line;
       while ((line = StreamUtil.readLine(is)) != null && !line.isEmpty()) {
-        // logger.info(line);
         String item[] = line.split(": ", 2);
         if (item.length != 2) {
           logger.warn("Length != 2");
@@ -99,26 +101,22 @@ public class InfomallDocumentIterator {
         return null;
       }
       StreamUtil.readLine(is);
-      // TODO unzip
+
       byte[] unzipBytes = JZlipUtil.decompress(bytes);
       data = new String(unzipBytes);
       Files.write(Paths.get("test.html"), unzipBytes);
 
       String charset = HtmlUtil.pCharset(detector, unzipBytes);
-//      logger.info(charset);
-      //charset = "gb18030";
       data = new String(unzipBytes, charset);
-//      Entry<String, String> data_charset = HtmlUtil.decode(unzipBytes, Arrays.asList("utf8", "gb18030"));
-//      data = data_charset.getKey();
-//      charset = data_charset.getValue();
-      
+
       String title = HtmlUtil.parseTitle(data);
       String content = HtmlUtil.parseContent(data);
+      String host = HtmlUtil.parseHost(url);
+      logger.info(url);
       InfomallDocument doc = new InfomallDocument(version, url, date, data,
-          position, charset, title,content);
+          position, charset, title, content, path, host);
       return doc;
     } catch (IOException e) {
-      // TODO Auto-generated catch block
       logger.error(ExceptionUtil.getStacktraceString(e));
       return null;
     }
@@ -140,19 +138,12 @@ public class InfomallDocumentIterator {
 
     try (SeekableInputStream is = new SeekableFileInputStream(new File(
         "F:/U200201/Web_Raw.U200201.0001"))) {
-      //is.seek(682210);
-      InfomallDocumentIterator iter = new InfomallDocumentIterator(is);
+      InfomallDocumentIterator iter = new InfomallDocumentIterator(is,
+          "F:/U200201/Web_Raw.U200201.0001");
       InfomallDocument doc;
       int i = 0;
       while ((doc = iter.next()) != null) {
-        // logger.info(++i + ": " + doc.url);
-        // logger.info(doc.url);
-        logger.info(doc.position);
-        logger.info(doc.charset);
-        logger.info(doc.title);
-        logger.info(doc.content);
-        // logger.info(doc.data);
-        // return;
+        logger.info(++i + ": " + doc.url);
       }
     } catch (IOException e) {
       logger.error(ExceptionUtil.getStacktraceString(e));
