@@ -16,5 +16,5 @@ mvn eclipse:eclipse -Dwtpversion=2.0
 ---
 ## How to Run
 ```bash
-mvn exec:java -Dexec.mainClass=<package.MainClass> -Dexec.classpathScope=compile -Dexec.args="arg1 arg2 ..."
+mvn exec:java -Dexec.classpathScope=compile -Dexec.mainClass=<package.MainClass> -Dexec.args="arg1 arg2 ..."
 ```

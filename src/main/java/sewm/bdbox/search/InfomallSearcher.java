@@ -3,6 +3,9 @@ package sewm.bdbox.search;
 import java.io.IOException;
 import java.nio.file.Paths;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
 import org.apache.logging.log4j.Logger;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -11,6 +14,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 
+import sewm.bdbox.util.CommandlineUtil;
 import sewm.bdbox.util.LogUtil;
 
 public class InfomallSearcher implements AutoCloseable {
@@ -52,7 +56,12 @@ public class InfomallSearcher implements AutoCloseable {
   }
 
   public static void main(String[] args) {
-    // TODO Jargs命令行参数
-    InfomallIndexer.index("F:/U200201/Web_Raw.U200201.0001", "F:/file");
+    Options options = new Options();
+    options.addOption(Option.builder().longOpt("help")
+        .desc("Print help message.").build());
+    options.addOption(Option.builder().longOpt("index").argName("path")
+        .hasArg().desc("Index path.").build());
+    CommandLine line = CommandlineUtil.parse(options, args);
+    LogUtil.check(logger, line.hasOption("index"), "Missing --index.");
   }
 }
