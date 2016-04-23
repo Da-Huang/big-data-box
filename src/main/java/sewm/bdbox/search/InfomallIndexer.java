@@ -93,14 +93,13 @@ public class InfomallIndexer {
   private static boolean indexDoc(IndexWriter writer, InfomallDocument doc) {
     try {
       Document doc1 = new Document();
-      // TODO: Build index for items.
-      doc1.add(new StoredField("path", doc.path));
-      doc1.add(new StoredField("position", doc.position));
-      doc1.add(new TextField("title", doc.title, Field.Store.NO));
-      doc1.add(new TextField("content", doc.content, Field.Store.NO));
-      doc1.add(new StringField("url", doc.url, Field.Store.NO));
-      doc1.add(new StringField("version", doc.version, Field.Store.NO));
-      doc1.add(new StringField("host", doc.host, Field.Store.NO));
+      doc1.add(new StoredField("path", doc.getPath()));
+      doc1.add(new StoredField("position", doc.getPosition()));
+      doc1.add(new TextField("title", doc.getTitle(), Field.Store.NO));
+      doc1.add(new TextField("content", doc.getContent(), Field.Store.NO));
+      doc1.add(new StringField("url", doc.getUrl(), Field.Store.NO));
+      doc1.add(new StringField("version", doc.getVersion(), Field.Store.NO));
+      doc1.add(new StringField("host", doc.getHost(), Field.Store.NO));
       writer.addDocument(doc1);
       return true;
     } catch (IOException e) {

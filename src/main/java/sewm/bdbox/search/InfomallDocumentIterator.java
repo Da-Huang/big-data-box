@@ -133,7 +133,7 @@ public class InfomallDocumentIterator {
       InfomallDocument doc;
       int i = 0;
       while ((doc = iter.next()) != null) {
-        logger.info(++i + ": " + doc.url);
+        logger.info(++i + ": " + doc.getUrl());
       }
     } catch (IOException e) {
       LogUtil.error(logger, e);
