@@ -9,6 +9,9 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
 import org.apache.logging.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.cjk.CJKAnalyzer;
@@ -25,11 +28,11 @@ import org.apache.lucene.store.FSDirectory;
 import org.tukaani.xz.SeekableFileInputStream;
 import org.tukaani.xz.SeekableInputStream;
 
-import sewm.bdbox.util.ExceptionUtil;
-import sewm.bdbox.util.LogManager;
+import sewm.bdbox.util.CommandlineUtil;
+import sewm.bdbox.util.LogUtil;
 
 public class InfomallIndexer {
-  private static Logger logger = LogManager.getLogger(InfomallIndexer.class);
+  private static Logger logger = LogUtil.getLogger(InfomallIndexer.class);
 
   public static boolean index(String dataPath, String indexPath) {
     try (Directory dir = FSDirectory.open(Paths.get(indexPath))) {
@@ -40,7 +43,7 @@ public class InfomallIndexer {
       indexDocCollections(writer, Paths.get(dataPath));
       return true;
     } catch (Exception e) {
-      logger.error(ExceptionUtil.getStacktraceString(e));
+      LogUtil.error(logger, e);
     }
     return true;
   }
@@ -60,7 +63,7 @@ public class InfomallIndexer {
             });
         return true;
       } catch (Exception e) {
-        logger.error(ExceptionUtil.getStacktraceString(e));
+        LogUtil.error(logger, e);
         return false;
       }
     } else {
@@ -82,7 +85,7 @@ public class InfomallIndexer {
 
       return true;
     } catch (Exception e) {
-      logger.error(ExceptionUtil.getStacktraceString(e));
+      LogUtil.error(logger, e);
       return false;
     }
   }
@@ -101,13 +104,21 @@ public class InfomallIndexer {
       writer.addDocument(doc1);
       return true;
     } catch (IOException e) {
-      logger.error(ExceptionUtil.getStacktraceString(e));
+      LogUtil.error(logger, e);
       return false;
     }
   }
 
   public static void main(String[] args) {
-    // TODO Jargs命令行参数
-    InfomallIndexer.index("F:/U200201/Web_Raw.U200201.0001", "F:/file");
+    Options options = new Options();
+    options.addOption(Option.builder().longOpt("help")
+        .desc("Print help message.").build());
+    options.addOption(Option.builder().longOpt("data").argName("path").hasArg()
+        .desc("Data path.").build());
+    options.addOption(Option.builder().longOpt("index").argName("path")
+        .hasArg().desc("Index path.").build());
+    CommandLine line = CommandlineUtil.parse(options, args);
+    if (!line.hasOption("data")) {
+    }
   }
 }

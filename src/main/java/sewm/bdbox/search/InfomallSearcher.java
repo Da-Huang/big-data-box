@@ -11,11 +11,10 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 
-import sewm.bdbox.util.ExceptionUtil;
-import sewm.bdbox.util.LogManager;
+import sewm.bdbox.util.LogUtil;
 
 public class InfomallSearcher implements AutoCloseable {
-  private static Logger logger = LogManager.getLogger(InfomallSearcher.class);
+  private static Logger logger = LogUtil.getLogger(InfomallSearcher.class);
 
   private IndexReader reader;
   private IndexSearcher searcher;
@@ -25,12 +24,12 @@ public class InfomallSearcher implements AutoCloseable {
       reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexPath)));
       searcher = new IndexSearcher(reader);
     } catch (Exception e) {
-      logger.error(ExceptionUtil.getStacktraceString(e));
+      LogUtil.error(logger, e);
       if (reader != null) {
         try {
           reader.close();
         } catch (IOException e1) {
-          logger.error(ExceptionUtil.getStacktraceString(e1));
+          LogUtil.error(logger, e1);
         }
       }
     }
@@ -40,7 +39,7 @@ public class InfomallSearcher implements AutoCloseable {
     try {
       return searcher.search(query, n);
     } catch (IOException e) {
-      logger.error(ExceptionUtil.getStacktraceString(e));
+      LogUtil.error(logger, e);
       return null;
     }
   }

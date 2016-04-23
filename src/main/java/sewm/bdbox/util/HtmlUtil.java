@@ -9,7 +9,7 @@ import org.jsoup.nodes.Document;
 import org.mozilla.universalchardet.UniversalDetector;
 
 public class HtmlUtil {
-  private static Logger logger = LogManager.getLogger(HtmlUtil.class);
+  private static Logger logger = LogUtil.getLogger(HtmlUtil.class);
 
   public static String pCharset(UniversalDetector detector, byte[] data) {
     String encoding;
@@ -82,8 +82,7 @@ public class HtmlUtil {
       String host = aUrl.getHost();
       return host;
     } catch (MalformedURLException e) {
-      // TODO Auto-generated catch block
-      logger.error(ExceptionUtil.getStacktraceString(e));
+      LogUtil.error(logger, e);
       return null;
     }
   }

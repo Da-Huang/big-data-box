@@ -1,5 +1,7 @@
 package sewm.bdbox.util;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -13,7 +15,7 @@ import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 
-public class LogManager {
+public class LogUtil {
   static {
     final LoggerContext ctx = (LoggerContext) org.apache.logging.log4j.LogManager
         .getContext(false);
@@ -48,5 +50,32 @@ public class LogManager {
 
   public static Logger getLogger(Class<?> clazz) {
     return org.apache.logging.log4j.LogManager.getLogger(clazz);
+  }
+
+  public static void fatal(Logger logger, String msg) {
+    logger.fatal(msg);
+    System.exit(-1);
+  }
+
+  public static void fatal(Logger logger, Exception e) {
+    fatal(logger, getStacktraceString(e));
+  }
+
+  public static void error(Logger logger, Exception e) {
+    logger.error(getStacktraceString(e));
+  }
+
+  public static void info(Logger logger, Exception e) {
+    logger.error(getStacktraceString(e));
+  }
+
+  public static void warn(Logger logger, Exception e) {
+    logger.error(getStacktraceString(e));
+  }
+
+  private static String getStacktraceString(Exception e) {
+    StringWriter sw = new StringWriter();
+    e.printStackTrace(new PrintWriter(sw));
+    return sw.toString();
   }
 }

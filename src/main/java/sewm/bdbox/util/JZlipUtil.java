@@ -6,7 +6,7 @@ import java.util.zip.Inflater;
 import org.apache.logging.log4j.Logger;
 
 public class JZlipUtil {
-  private static Logger logger = LogManager.getLogger(JZlipUtil.class);
+  private static Logger logger = LogUtil.getLogger(JZlipUtil.class);
 
   public static byte[] decompress(byte[] data) {
     Inflater inflater = new Inflater();
@@ -20,7 +20,7 @@ public class JZlipUtil {
       byte[] output = outputStream.toByteArray();
       return output;
     } catch (Exception e) {
-      logger.error(ExceptionUtil.getStacktraceString(e));
+      LogUtil.error(logger, e);
       return null;
     }
   }

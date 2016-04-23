@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 import org.apache.logging.log4j.Logger;
 
 public class StreamUtil {
-  private static Logger logger = LogManager.getLogger(StreamUtil.class);
+  private static Logger logger = LogUtil.getLogger(StreamUtil.class);
 
   public static String readLine(InputStream is) {
     try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
@@ -23,7 +23,7 @@ public class StreamUtil {
       }
       return new String(outputStream.toByteArray());
     } catch (IOException e) {
-      logger.error(ExceptionUtil.getStacktraceString(e));
+      LogUtil.error(logger, e);
       return null;
     }
   }
@@ -35,7 +35,7 @@ public class StreamUtil {
         logger.info(line);
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      LogUtil.error(logger, e);
     }
   }
 }

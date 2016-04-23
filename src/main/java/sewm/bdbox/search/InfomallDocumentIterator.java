@@ -14,14 +14,13 @@ import org.mozilla.universalchardet.UniversalDetector;
 import org.tukaani.xz.SeekableFileInputStream;
 import org.tukaani.xz.SeekableInputStream;
 
-import sewm.bdbox.util.ExceptionUtil;
 import sewm.bdbox.util.HtmlUtil;
 import sewm.bdbox.util.JZlipUtil;
-import sewm.bdbox.util.LogManager;
+import sewm.bdbox.util.LogUtil;
 import sewm.bdbox.util.StreamUtil;
 
 public class InfomallDocumentIterator {
-  private static Logger logger = LogManager
+  private static Logger logger = LogUtil
       .getLogger(InfomallDocumentIterator.class);
   private SeekableInputStream is;
   private String path;
@@ -109,7 +108,7 @@ public class InfomallDocumentIterator {
           position, charset, title, content, path, host);
       return doc;
     } catch (IOException e) {
-      logger.error(ExceptionUtil.getStacktraceString(e));
+      LogUtil.error(logger, e);
       return null;
     }
   }
@@ -121,7 +120,7 @@ public class InfomallDocumentIterator {
       Date date = sdf.parse(dateStr);
       return date;
     } catch (Exception e) {
-      logger.error(ExceptionUtil.getStacktraceString(e));
+      LogUtil.error(logger, e);
     }
     return null;
   }
@@ -137,7 +136,7 @@ public class InfomallDocumentIterator {
         logger.info(++i + ": " + doc.url);
       }
     } catch (IOException e) {
-      logger.error(ExceptionUtil.getStacktraceString(e));
+      LogUtil.error(logger, e);
     }
   }
 }
