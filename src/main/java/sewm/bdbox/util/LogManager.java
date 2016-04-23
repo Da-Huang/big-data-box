@@ -18,12 +18,11 @@ public class LogManager {
     final LoggerContext ctx = (LoggerContext) org.apache.logging.log4j.LogManager
         .getContext(false);
     final Configuration config = ctx.getConfiguration();
-    Layout<?> layout = PatternLayout
-        .createLayout(
-            "%p: %d{yyyy-MM-dd HH:mm:ss} [%t] %C:%M(%L): %msg%xEx%n" /* pattern */,
-            null /* patternSelector */, config, null /* replace */,
-            StandardCharsets.UTF_8, true /* alwaysWriteExceptions */,
-            false /* noConsoleNoAnsi */, null /* header */, null /* footer */);
+    Layout<?> layout = PatternLayout.createLayout(
+        "%p: %d{yyyy-MM-dd HH:mm:ss} [%t] %C:%M(%L): %msg%xEx%n" /* pattern */,
+        null /* patternSelector */, config, null /* replace */,
+        StandardCharsets.UTF_8, true /* alwaysWriteExceptions */,
+        false /* noConsoleNoAnsi */, null /* header */, null /* footer */);
 
     SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd-hhmmss");
     String filename = String.format("logs/%s.%s.log", formatter
@@ -41,14 +40,13 @@ public class LogManager {
       loggerConfig.addAppender(appender, null, null);
     }
     config.getRootLogger().addAppender(appender, null, null);
-
   }
 
-  static Logger getLogger(String name) {
+  public static Logger getLogger(String name) {
     return org.apache.logging.log4j.LogManager.getLogger(name);
   }
 
-  static Logger getLogger(Class<?> clazz) {
+  public static Logger getLogger(Class<?> clazz) {
     return org.apache.logging.log4j.LogManager.getLogger(clazz);
   }
 }

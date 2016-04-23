@@ -2,22 +2,13 @@ package sewm.bdbox.search;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.Locale;
-import java.util.Map.Entry;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mozilla.universalchardet.UniversalDetector;
 import org.tukaani.xz.SeekableFileInputStream;
@@ -26,6 +17,7 @@ import org.tukaani.xz.SeekableInputStream;
 import sewm.bdbox.util.ExceptionUtil;
 import sewm.bdbox.util.HtmlUtil;
 import sewm.bdbox.util.JZlipUtil;
+import sewm.bdbox.util.LogManager;
 import sewm.bdbox.util.StreamUtil;
 
 public class InfomallDocumentIterator {
@@ -135,7 +127,6 @@ public class InfomallDocumentIterator {
   }
 
   public static void main(String[] args) {
-
     try (SeekableInputStream is = new SeekableFileInputStream(new File(
         "F:/U200201/Web_Raw.U200201.0001"))) {
       InfomallDocumentIterator iter = new InfomallDocumentIterator(is,

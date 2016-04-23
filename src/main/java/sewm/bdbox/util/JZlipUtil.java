@@ -3,7 +3,6 @@ package sewm.bdbox.util;
 import java.io.ByteArrayOutputStream;
 import java.util.zip.Inflater;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class JZlipUtil {
