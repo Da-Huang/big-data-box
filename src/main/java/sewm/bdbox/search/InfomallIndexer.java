@@ -8,6 +8,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -31,58 +33,63 @@ import org.tukaani.xz.SeekableInputStream;
 import sewm.bdbox.util.CommandlineUtil;
 import sewm.bdbox.util.LogUtil;
 
-public class InfomallIndexer {
+public class InfomallIndexer implements AutoCloseable {
   private static Logger logger = LogUtil.getLogger(InfomallIndexer.class);
 
-  public static boolean index(String dataPath, String indexPath) {
-    try (Directory dir = FSDirectory.open(Paths.get(indexPath))) {
-      Analyzer analyzer = new CJKAnalyzer(); // chinese
-      IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
-      iwc.setOpenMode(OpenMode.CREATE);
-      IndexWriter writer = new IndexWriter(dir, iwc);
-      indexDocCollections(writer, Paths.get(dataPath));
-      return true;
-    } catch (Exception e) {
-      LogUtil.error(logger, e);
-    }
-    return true;
+  private static final String INFOMALL_COLLECTION_PREFIX = "Web_RAW_U";
+
+  private Directory dir = null;
+  private IndexWriter writer = null;
+  private Set<String> ignoredCollections = null;
+
+  private InfomallIndexer(Builder builder) throws IOException {
+    Analyzer analyzer = new CJKAnalyzer();
+    IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
+    iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
+    iwc.setRAMBufferSizeMB(builder.bufferSizeMB);
+    dir = FSDirectory.open(Paths.get(builder.indexPath));
+    writer = new IndexWriter(dir, iwc);
+    ignoredCollections = builder.ignoredCollections;
   }
 
-  private static boolean indexDocCollections(IndexWriter writer, Path path) {
+  public boolean index(String dataPath, String indexPath) {
+    return indexDocCollections(Paths.get(dataPath));
+  }
+
+  private boolean indexDocCollections(Path path) {
     if (Files.isDirectory(path)) {
       try {
-        Files.walkFileTree(path, new SimpleFileVisitor<Path>() { // 递归文件目录，每遇到新文件callsimple功能
-              @Override
-              public FileVisitResult visitFile(Path file,
-                  BasicFileAttributes attrs) {// only path
-                // TODO:处理判断
-                indexDocCollection(writer, file); // 加过滤，有非数据文件，通过后缀处理
-
-                return FileVisitResult.CONTINUE;
-              }
-            });
+        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+          @Override
+          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+            if (file.startsWith(INFOMALL_COLLECTION_PREFIX)
+                && ignoredCollections.contains(file.getFileName())) {
+              indexDocCollection(file);
+            } else {
+              logger.info("Ignored " + file);
+            }
+            return FileVisitResult.CONTINUE;
+          }
+        });
         return true;
       } catch (Exception e) {
         LogUtil.error(logger, e);
         return false;
       }
     } else {
-      return indexDocCollection(writer, path);
+      return indexDocCollection(path);
     }
   }
 
-  private static boolean indexDocCollection(IndexWriter writer, Path file) {
+  private boolean indexDocCollection(Path file) {
     try (SeekableInputStream is = new SeekableFileInputStream(new File(
         file.toString()))) {
       InfomallDocumentIterator iter = new InfomallDocumentIterator(is,
           file.toString());
       InfomallDocument doc;
-      int i = 0;
       while ((doc = iter.next()) != null) {
-        logger.info(++i);
-        indexDoc(writer, doc);
+        indexDoc(doc);
       }
-
       return true;
     } catch (Exception e) {
       LogUtil.error(logger, e);
@@ -90,7 +97,7 @@ public class InfomallIndexer {
     }
   }
 
-  private static boolean indexDoc(IndexWriter writer, InfomallDocument doc) {
+  private boolean indexDoc(InfomallDocument doc) {
     try {
       Document doc1 = new Document();
       doc1.add(new StoredField("path", doc.getPath()));
@@ -108,6 +115,56 @@ public class InfomallIndexer {
     }
   }
 
+  @Override
+  public void close() throws IOException {
+    if (writer != null) {
+      writer.close();
+    }
+    if (dir != null) {
+      dir.close();
+    }
+  }
+
+  public static class Builder {
+    private String indexPath;
+    private double bufferSizeMB;
+    private Set<String> ignoredCollections = new HashSet<String>();
+
+    public Builder indexPath(String indexPath) {
+      this.indexPath = indexPath;
+      return this;
+    }
+
+    public Builder bufferSizeMB(double bufferSizeMB) {
+      this.bufferSizeMB = bufferSizeMB;
+      return this;
+    }
+
+    public Builder ignoreCollections(Set<String> ignoredCollections) {
+      this.ignoredCollections = ignoredCollections;
+      return this;
+    }
+
+    public Builder ignoreCollections(String ignoredCollectionsFile) {
+      try {
+        this.ignoredCollections = new HashSet<String>(Files.readAllLines(Paths
+            .get(ignoredCollectionsFile)));
+      } catch (IOException e) {
+        logger.warn(ignoredCollectionsFile
+            + "not found. Will not ignore any collection.");
+      }
+      return this;
+    }
+
+    public InfomallIndexer build() throws IOException {
+      return new InfomallIndexer(this);
+    }
+  }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
   public static void main(String[] args) {
     Options options = new Options();
     options.addOption(Option.builder().longOpt("help")
@@ -116,8 +173,23 @@ public class InfomallIndexer {
         .desc("Data path.").build());
     options.addOption(Option.builder().longOpt("index").argName("path")
         .hasArg().desc("Index path.").build());
+    options.addOption(Option.builder().longOpt("ignored_collections")
+        .argName("path").hasArg().desc("Ignored collections path.").build());
     CommandLine line = CommandlineUtil.parse(options, args);
+
     LogUtil.check(logger, line.hasOption("data"), "Missing --data.");
     LogUtil.check(logger, line.hasOption("index"), "Missing --index.");
+    InfomallIndexer.Builder builder = InfomallIndexer
+        .builder()
+        .indexPath(line.getOptionValue("data"))
+        .ignoreCollections(
+            line.getOptionValue("ignored_collections",
+                "ignored_collections.txt"));
+
+    try (InfomallIndexer indexer = builder.build()) {
+
+    } catch (IOException e) {
+      LogUtil.error(logger, e);
+    }
   }
 }

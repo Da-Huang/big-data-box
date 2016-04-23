@@ -20,23 +20,12 @@ import sewm.bdbox.util.LogUtil;
 public class InfomallSearcher implements AutoCloseable {
   private static Logger logger = LogUtil.getLogger(InfomallSearcher.class);
 
-  private IndexReader reader;
-  private IndexSearcher searcher;
+  private IndexReader reader = null;
+  private IndexSearcher searcher = null;
 
-  public InfomallSearcher(String indexPath) {
-    try {
-      reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexPath)));
-      searcher = new IndexSearcher(reader);
-    } catch (Exception e) {
-      LogUtil.error(logger, e);
-      if (reader != null) {
-        try {
-          reader.close();
-        } catch (IOException e1) {
-          LogUtil.error(logger, e1);
-        }
-      }
-    }
+  public InfomallSearcher(String indexPath) throws IOException {
+    reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexPath)));
+    searcher = new IndexSearcher(reader);
   }
 
   public TopDocs search(Query query, int n) {
@@ -49,7 +38,7 @@ public class InfomallSearcher implements AutoCloseable {
   }
 
   @Override
-  public void close() throws Exception {
+  public void close() throws IOException {
     if (reader != null) {
       reader.close();
     }
