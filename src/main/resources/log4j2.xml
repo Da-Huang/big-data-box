@@ -1,32 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
 <configuration status="error">
   <appenders>
     <Console name="Console" target="SYSTEM_ERR">
       <ThresholdFilter level="trace" onMatch="ACCEPT" onMismatch="DENY"/>
-      <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %-5.5t:%class{36} %L %M - %msg%xEx%n"/>
+      <PatternLayout pattern="%p: %d{yyyy-MM-dd HH:mm:ss} [%t] %C:%M(%L): %msg%xEx%n"/>
     </Console>
-    <!--
-    <RollingFile name="RollingFile" fileName="logs/app.log"
-                 filePattern="logs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz">
-      <PatternLayout pattern="%d{yyyy.MM.dd 'at' HH:mm:ss z} %-5level %-5.5t:%class{36} %L %M - %msg%xEx%n"/>
-      <SizeBasedTriggeringPolicy size="100 MB" />
-    </RollingFile>
-    -->
-    <File name="File" fileName="logs/${sys:log.filename}.log" append="false">
-      <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %-5.5t:%class{36} %L %M - %msg%xEx%n"/>
-    </File>
   </appenders>
   <loggers>
-    <root level="trace">
-      <!--<appender-ref ref="RollingFile"/>-->
+    <root level="info">
       <appender-ref ref="Console"/>
-      <appender-ref ref="File"/>
     </root>
-    <!--
-    <logger name="user.User" level="debug" additivity="false">
-    </logger>
-    <logger name="page.Fetcher" level="debug" additivity="false">
-    </logger>
-    -->
   </loggers>
 </configuration>
