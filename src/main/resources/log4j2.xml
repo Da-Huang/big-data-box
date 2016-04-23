@@ -3,13 +3,15 @@
 <configuration status="error">
   <appenders>
     <Console name="Console" target="SYSTEM_ERR">
-      <ThresholdFilter level="trace" onMatch="ACCEPT" onMismatch="DENY"/>
-      <PatternLayout pattern="%p: %d{yyyy-MM-dd HH:mm:ss} [%t] %C:%M(%L): %msg%xEx%n"/>
+      <ThresholdFilter level="trace" onMatch="ACCEPT"
+        onMismatch="DENY" />
+      <PatternLayout
+        pattern="%p: %d{yyyy-MM-dd HH:mm:ss} [%t] %C:%M(%L): %msg%xEx%n" />
     </Console>
   </appenders>
   <loggers>
     <root level="info">
-      <appender-ref ref="Console"/>
+      <appender-ref ref="Console" />
     </root>
   </loggers>
 </configuration>
