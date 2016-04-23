@@ -117,7 +117,7 @@ public class InfomallIndexer {
     options.addOption(Option.builder().longOpt("index").argName("path")
         .hasArg().desc("Index path.").build());
     CommandLine line = CommandlineUtil.parse(options, args);
-    if (!line.hasOption("data")) {
-    }
+    LogUtil.check(logger, line.hasOption("data"), "Missing --data.");
+    LogUtil.check(logger, line.hasOption("index"), "Missing --index.");
   }
 }

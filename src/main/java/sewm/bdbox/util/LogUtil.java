@@ -52,6 +52,12 @@ public class LogUtil {
     return org.apache.logging.log4j.LogManager.getLogger(clazz);
   }
 
+  public static void check(Logger logger, boolean condition, String msg) {
+    if (!condition) {
+      fatal(logger, msg);
+    }
+  }
+
   public static void fatal(Logger logger, String msg) {
     logger.fatal(msg);
     System.exit(-1);

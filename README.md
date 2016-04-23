@@ -12,3 +12,9 @@ This project aims at providing visualization and development APIs for Big Data i
 ```bash
 mvn eclipse:eclipse -Dwtpversion=2.0
 ```
+
+---
+## How to Run
+```bash
+mvn exec:java -Dexec.mainClass=<package.MainClass> -Dexec.classpathScope=compile -Dexec.args="arg1 arg2 ..."
+```
