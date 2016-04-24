@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.lucene.document.Document;
 
 import sewm.bdbox.search.InfomallDocument;
-import sewm.bdbox.util.InfomallDocumentFetchUtil;
+import sewm.bdbox.util.InfomallFetchUtil;
 import sewm.bdbox.util.LogUtil;
 
 public class ContentServlet extends HttpServlet {
@@ -36,7 +36,7 @@ public class ContentServlet extends HttpServlet {
     try {
       int id = Integer.parseInt(idStr);
       Document doc = WebSingleton.getInfomallSearcher().doc(id);
-      InfomallDocument infomallDoc = InfomallDocumentFetchUtil.fetch(
+      InfomallDocument infomallDoc = InfomallFetchUtil.fetch(
           DATA_ROOT_PATH, doc.get("filename"),
           Long.parseLong(doc.get("position")));
       resp.getOutputStream().write(infomallDoc.getUnzipBytes());

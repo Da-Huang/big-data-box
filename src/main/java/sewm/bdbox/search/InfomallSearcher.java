@@ -23,7 +23,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 
 import sewm.bdbox.util.CommandlineUtil;
-import sewm.bdbox.util.InfomallDocumentFetchUtil;
+import sewm.bdbox.util.InfomallFetchUtil;
 import sewm.bdbox.util.LogUtil;
 
 public class InfomallSearcher implements AutoCloseable {
@@ -99,7 +99,7 @@ public class InfomallSearcher implements AutoCloseable {
       for (ScoreDoc scoreDoc : top.scoreDocs) {
         Document doc = searcher.doc(scoreDoc.doc);
         logger.info(doc.get("filename") + ", " + doc.get("position"));
-        InfomallDocument infomallDoc = InfomallDocumentFetchUtil.fetch(
+        InfomallDocument infomallDoc = InfomallFetchUtil.fetch(
             line.getOptionValue("data"), doc.get("filename"),
             doc.get("position"));
         logger.info(infomallDoc.getUrl() + " " + infomallDoc.getTitle());

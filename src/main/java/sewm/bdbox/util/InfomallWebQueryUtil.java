@@ -12,9 +12,9 @@ import org.apache.lucene.search.BoostQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
-public class InfomallQueryUtil {
+public class InfomallWebQueryUtil {
   private static final Logger logger = LogUtil
-      .getLogger(InfomallQueryUtil.class);
+      .getLogger(InfomallWebQueryUtil.class);
 
   public static Query parseTitleQuery(String title, float boost) {
     if (title == null) {
@@ -25,7 +25,7 @@ public class InfomallQueryUtil {
     try {
       return new BoostQuery(parser.parse(title), boost);
     } catch (ParseException e) {
-      LogUtil.error(logger, e);
+      logger.error(e.getMessage());
       return null;
     }
   }
@@ -39,7 +39,7 @@ public class InfomallQueryUtil {
     try {
       return parser.parse(content);
     } catch (ParseException e) {
-      LogUtil.error(logger, e);
+      logger.error(e.getMessage());
       return null;
     }
   }
@@ -93,18 +93,18 @@ public class InfomallQueryUtil {
       try {
         start = Long.parseLong(startDate);
       } catch (NumberFormatException e) {
-        LogUtil.error(logger, e);
+        logger.error(e.getMessage());
       }
     }
     if (endDate != null) {
       try {
         end = Long.parseLong(endDate);
       } catch (NumberFormatException e) {
-        LogUtil.error(logger, e);
+        logger.error(e.getMessage());
       }
     }
-    return start == Long.MIN_VALUE && end == Long.MAX_VALUE
-        ? LongPoint.newRangeQuery("date", start, end) : null;
+    return start == Long.MIN_VALUE && end == Long.MAX_VALUE ? null
+        : LongPoint.newRangeQuery("date", start, end);
   }
 
   public static Query parseUrlQuery(String url) {
@@ -116,11 +116,36 @@ public class InfomallQueryUtil {
   }
 
   public static float parseTitleBoost(String titleBoost) {
+    if (titleBoost == null) {
+      return 10f;
+    }
     try {
       return Float.parseFloat(titleBoost);
     } catch (NumberFormatException e) {
-      LogUtil.error(logger, e);
+      logger.error(e.getMessage());
       return 10f;
+    }
+  }
+
+  public static int parseStart(String start) {
+    if (start == null) {
+      return 0;
+    }
+    try {
+      return Integer.parseInt(start);
+    } catch (NumberFormatException e) {
+      return 0;
+    }
+  }
+
+  public static int parseLimit(String limit) {
+    if (limit == null) {
+      return 0;
+    }
+    try {
+      return Integer.parseInt(limit);
+    } catch (NumberFormatException e) {
+      return 0;
     }
   }
 }

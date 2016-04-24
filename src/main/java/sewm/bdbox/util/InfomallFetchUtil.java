@@ -12,9 +12,9 @@ import org.tukaani.xz.SeekableInputStream;
 import sewm.bdbox.search.InfomallDocument;
 import sewm.bdbox.search.InfomallDocumentIterator;
 
-public class InfomallDocumentFetchUtil {
+public class InfomallFetchUtil {
   private static final Logger logger = LogUtil
-      .getLogger(InfomallDocumentFetchUtil.class);
+      .getLogger(InfomallFetchUtil.class);
 
   public static InfomallDocument fetch(String infomallDataRoot, String filename,
       String position) {

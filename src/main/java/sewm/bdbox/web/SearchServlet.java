@@ -9,8 +9,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TopDocs;
 
-import sewm.bdbox.util.InfomallQueryUtil;
+import sewm.bdbox.util.InfomallWebQueryUtil;
 import sewm.bdbox.util.LogUtil;
 
 public class SearchServlet extends HttpServlet {
@@ -20,8 +21,6 @@ public class SearchServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
-    resp.setContentType("text/html");
-
     String start = req.getParameter("start");
     String limit = req.getParameter("limit");
 
@@ -36,15 +35,26 @@ public class SearchServlet extends HttpServlet {
     String titleBoost = req.getParameter("title_boost");
 
     logger.info(String.format(
-        "start=%s, limit=%s, url=%s, host=%s, start_date=%s, end_date=%s, text=%s, title=%s, content=%s, titleBoost=%s",
-        url, host, startDate, endDate, text, title, content, titleBoost));
+        "start=%s, limit=%s, url=%s, host=%s, start_date=%s, end_date=%s, "
+            + "text=%s, title=%s, content=%s, titleBoost=%s",
+        start, limit, url, host, startDate, endDate, text, title, content,
+        titleBoost));
 
-    Query query = InfomallQueryUtil.parseQuery(url, host, startDate, endDate,
+    Query query = InfomallWebQueryUtil.parseQuery(url, host, startDate, endDate,
         text, title, content, titleBoost);
-    logger.info(query);
+    logger.info("Query: " + query);
+
+    if (query == null) {
+      resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid query.");
+      return;
+    }
+
+    int startInt = InfomallWebQueryUtil.parseStart(start);
+    int limitInt = InfomallWebQueryUtil.parseLimit(limit);
+    TopDocs top = WebSingleton.getInfomallSearcher().search(query,
+        startInt + limitInt);
   }
 
   public static void main(String[] args) {
-    System.out.println(Long.parseLong(null, 3));
   }
 }
