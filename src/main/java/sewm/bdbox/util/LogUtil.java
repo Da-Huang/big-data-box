@@ -26,7 +26,7 @@ public class LogUtil {
         StandardCharsets.UTF_8, true /* alwaysWriteExceptions */,
         false /* noConsoleNoAnsi */, null /* header */, null /* footer */);
 
-    SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd-hhmmss");
+    SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd-HHmmss");
     String filename = String.format("logs/%s.%s.log", formatter
         .format(new Date()),
         System.getProperty("sun.java.command").split("\\s+", 2)[0]);

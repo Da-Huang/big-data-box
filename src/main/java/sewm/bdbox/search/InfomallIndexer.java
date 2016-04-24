@@ -86,9 +86,13 @@ public class InfomallIndexer implements AutoCloseable {
           + " documents indexed. Go on processing " + file.getFileName());
       int numDocs = writer.numDocs();
       boolean success = indexDocCollection(file);
-      logger.info("Processed " + file.getFileName() + "["
-          + (writer.numDocs() - numDocs) + "], and ignore it.");
-      ignoredCollections.add(file.getFileName().toString());
+      if (success) {
+        logger.info("Processed " + file.getFileName() + "["
+            + (writer.numDocs() - numDocs) + "], and ignore it.");
+        ignoredCollections.add(file.getFileName().toString());
+      } else {
+        logger.info("Failed to process " + file.getFileName() + ".");
+      }
       return success;
     } else {
       logger.info("Ignored " + file);
