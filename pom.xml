@@ -114,6 +114,8 @@
             </goals>
             <configuration>
               <outputDirectory>${project.build.directory}/lib</outputDirectory>
+              <outputDirectory>${project.build.directory}/big-data-box/WEB-INF/lib</outputDirectory>
+              <outputDirectory>${project.basedir}/src/main/webapp/WEB-INF/lib</outputDirectory>
               <overWriteReleases>false</overWriteReleases>
               <overWriteSnapshots>false</overWriteSnapshots>
               <overWriteIfNewer>true</overWriteIfNewer>

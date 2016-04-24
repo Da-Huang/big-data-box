@@ -27,6 +27,7 @@ public class InfomallDocumentFetchUtil {
     Path path = Paths.get(infomallDataRoot).resolve(dir).resolve(filename);
     try (SeekableInputStream is = new SeekableFileInputStream(
         new File(path.toUri()))) {
+      is.seek(position);
       InfomallDocumentIterator iter = new InfomallDocumentIterator(is,
           filename);
       return iter.next();
