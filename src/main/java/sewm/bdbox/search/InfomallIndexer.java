@@ -164,7 +164,7 @@ public class InfomallIndexer implements AutoCloseable {
 
   public static class Builder {
     private String indexPath;
-    private double bufferSizeMB = 4096;
+    private double bufferSizeMB = 2048;
     private Set<String> ignoredCollections = new HashSet<String>();
     private boolean create = false;
 
