@@ -7,8 +7,16 @@
     <servlet-name>HelloServlet</servlet-name>
     <servlet-class>sewm.bdbox.web.HelloServlet</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>SearchServlet</servlet-name>
+    <servlet-class>sewm.bdbox.web.SearchServlet</servlet-class>
+  </servlet>
   <servlet-mapping>
     <servlet-name>HelloServlet</servlet-name>
     <url-pattern>/hello</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>SearchServlet</servlet-name>
+    <url-pattern>/search/*</url-pattern>
   </servlet-mapping>
 </web-app>
