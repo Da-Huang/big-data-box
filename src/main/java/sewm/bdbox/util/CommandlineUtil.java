@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.lucene.util.CommandLineUtil;
 
 public class CommandlineUtil {
-  private static Logger logger = LogUtil.getLogger(CommandLineUtil.class);
+  private static final Logger logger = LogUtil.getLogger(CommandLineUtil.class);
 
   public static CommandLine parse(Options options, String[] args) {
     CommandLineParser parser = new DefaultParser();

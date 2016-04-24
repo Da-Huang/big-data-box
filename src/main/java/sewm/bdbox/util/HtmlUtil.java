@@ -15,7 +15,7 @@ import org.apache.logging.log4j.Logger;
 import org.mozilla.universalchardet.UniversalDetector;
 
 public class HtmlUtil {
-  private static Logger logger = LogUtil.getLogger(HtmlUtil.class);
+  private static final Logger logger = LogUtil.getLogger(HtmlUtil.class);
 
   public static String pCharset(UniversalDetector detector, byte[] data) {
     String encoding;

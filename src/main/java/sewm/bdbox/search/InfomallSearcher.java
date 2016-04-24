@@ -27,7 +27,7 @@ import sewm.bdbox.util.InfomallDocumentFetchUtil;
 import sewm.bdbox.util.LogUtil;
 
 public class InfomallSearcher implements AutoCloseable {
-  private static Logger logger = LogUtil.getLogger(InfomallSearcher.class);
+  private static final Logger logger = LogUtil.getLogger(InfomallSearcher.class);
 
   private IndexReader reader = null;
   private IndexSearcher searcher = null;

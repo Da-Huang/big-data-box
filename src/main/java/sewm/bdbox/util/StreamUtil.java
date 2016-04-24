@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 import org.apache.logging.log4j.Logger;
 
 public class StreamUtil {
-  private static Logger logger = LogUtil.getLogger(StreamUtil.class);
+  private static final Logger logger = LogUtil.getLogger(StreamUtil.class);
 
   public static String readLine(InputStream is) {
     try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {

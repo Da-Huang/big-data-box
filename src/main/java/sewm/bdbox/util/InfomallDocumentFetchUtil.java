@@ -13,7 +13,7 @@ import sewm.bdbox.search.InfomallDocument;
 import sewm.bdbox.search.InfomallDocumentIterator;
 
 public class InfomallDocumentFetchUtil {
-  private static Logger logger = LogUtil
+  private static final Logger logger = LogUtil
       .getLogger(InfomallDocumentFetchUtil.class);
 
   public static InfomallDocument fetch(String infomallDataRoot, String filename,

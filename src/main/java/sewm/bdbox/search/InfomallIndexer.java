@@ -35,7 +35,7 @@ import sewm.bdbox.util.CommandlineUtil;
 import sewm.bdbox.util.LogUtil;
 
 public class InfomallIndexer implements AutoCloseable {
-  private static Logger logger = LogUtil.getLogger(InfomallIndexer.class);
+  private static final Logger logger = LogUtil.getLogger(InfomallIndexer.class);
 
   private static final String INFOMALL_COLLECTION_PREFIX = "Web_Raw.U";
 

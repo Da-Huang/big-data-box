@@ -24,7 +24,7 @@ import sewm.bdbox.util.LogUtil;
 import sewm.bdbox.util.StreamUtil;
 
 public class InfomallDocumentIterator {
-  private static Logger logger = LogUtil
+  private static final Logger logger = LogUtil
       .getLogger(InfomallDocumentIterator.class);
   private SeekableInputStream is;
   private String filename;
