@@ -50,12 +50,15 @@ public class SearchServlet extends HttpServlet {
       return;
     }
 
+    resp.setContentType("application/json");
+    resp.setCharacterEncoding("utf8");
     int startInt = InfomallWebQueryUtil.parseStart(start);
     int limitInt = InfomallWebQueryUtil.parseLimit(limit);
     TopDocs top = WebSingleton.getInfomallSearcher().search(query,
         startInt + limitInt);
     InfomallSearchUtil.writeResultAsJson(resp.getWriter(),
-        ContentServlet.DATA_ROOT_PATH, WebSingleton.getInfomallSearcher(), top);
+        ContentServlet.DATA_ROOT_PATH, WebSingleton.getInfomallSearcher(), top,
+        startInt);
   }
 
   public static void main(String[] args) {

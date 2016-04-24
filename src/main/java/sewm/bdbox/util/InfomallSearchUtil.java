@@ -14,11 +14,12 @@ import sewm.bdbox.search.InfomallSearcher;
 
 public class InfomallSearchUtil {
   public static void writeResultAsJson(Writer writer, String infomallDataRoot,
-      InfomallSearcher searcher, TopDocs top) {
+      InfomallSearcher searcher, TopDocs top, int start) {
     JsonGenerator generator = Json.createGenerator(writer);
     generator.writeStartObject().write("total_hits", top.totalHits)
         .writeStartArray("docs");
-    for (ScoreDoc scoreDoc : top.scoreDocs) {
+    for (int i = start; i < top.scoreDocs.length; ++i) {
+      ScoreDoc scoreDoc = top.scoreDocs[i];
       Document doc = searcher.doc(scoreDoc.doc);
       InfomallDocument infomallDoc = InfomallFetchUtil.fetch(infomallDataRoot,
           doc.get("filename"), doc.get("position"));
@@ -29,6 +30,6 @@ public class InfomallSearchUtil {
           .write("date", infomallDoc.getDate().getTime())
           .write("length", infomallDoc.getUnzipBytes().length).writeEnd();
     }
-    generator.writeEnd().writeEnd();
+    generator.writeEnd().writeEnd().close();
   }
 }
