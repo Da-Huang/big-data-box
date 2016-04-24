@@ -221,7 +221,7 @@ public class InfomallIndexer implements AutoCloseable {
         Option.builder().longOpt("help").desc("Print help message.").build());
     options.addOption(Option.builder().longOpt("data").argName("path").hasArg()
         .desc("Data path.").build());
-    options.addOption(Option.builder().longOpt("index").argName("path").hasArg()
+    options.addOption(Option.builder().longOpt("index").argName("dir").hasArg()
         .desc("Index path.").build());
     options.addOption(Option.builder().longOpt("ignored_collections")
         .argName("path").hasArg().desc("Ignored collections path.").build());

@@ -13,16 +13,13 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.queryparser.xml.builders.BooleanQueryBuilder;
+import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.store.FSDirectory;
-
-import com.sun.javafx.scene.paint.GradientUtils.Parser;
 
 import sewm.bdbox.util.CommandlineUtil;
 import sewm.bdbox.util.InfomallDocumentFetchUtil;
@@ -70,13 +67,14 @@ public class InfomallSearcher implements AutoCloseable {
         Option.builder().longOpt("help").desc("Print help message.").build());
     options.addOption(Option.builder().longOpt("data").argName("path").hasArg()
         .desc("Data path.").build());
-    options.addOption(Option.builder().longOpt("index").argName("path").hasArg()
+    options.addOption(Option.builder().longOpt("index").argName("dir").hasArg()
         .desc("Index path.").build());
     options.addOption(Option.builder().longOpt("query").argName("string")
         .hasArg().desc("Query string.").build());
     options.addOption(Option.builder().longOpt("limit").argName("int").hasArg()
         .desc("Limited number of displayed documents.").build());
     CommandLine line = CommandlineUtil.parse(options, args);
+
     LogUtil.check(logger, line.hasOption("index"), "Missing --index.");
     LogUtil.check(logger, line.hasOption("data"), "Missing --data.");
     LogUtil.check(logger, line.hasOption("query"), "Missing --query.");

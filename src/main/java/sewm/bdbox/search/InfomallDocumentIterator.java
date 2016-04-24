@@ -2,16 +2,22 @@ package sewm.bdbox.search;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
 import org.apache.logging.log4j.Logger;
 import org.mozilla.universalchardet.UniversalDetector;
 import org.tukaani.xz.SeekableFileInputStream;
 import org.tukaani.xz.SeekableInputStream;
 
+import sewm.bdbox.util.CommandlineUtil;
 import sewm.bdbox.util.HtmlUtil;
 import sewm.bdbox.util.JZlipUtil;
 import sewm.bdbox.util.LogUtil;
@@ -116,10 +122,20 @@ public class InfomallDocumentIterator {
   }
 
   public static void main(String[] args) {
+    Options options = new Options();
+    options.addOption(
+        Option.builder().longOpt("help").desc("Print help message.").build());
+    options.addOption(Option.builder().longOpt("data").argName("file").hasArg()
+        .desc("Data path.").build());
+    CommandLine line = CommandlineUtil.parse(options, args);
+
+    LogUtil.check(logger, line.hasOption("data"), "Missing --data.");
+
+    Path data = Paths.get(line.getOptionValue("data"));
     try (SeekableInputStream is = new SeekableFileInputStream(
-        new File("F:/U200201/Web_Raw.U200201.0001"))) {
+        new File(data.toUri()))) {
       InfomallDocumentIterator iter = new InfomallDocumentIterator(is,
-          "F:/U200201/Web_Raw.U200201.0001");
+          data.getFileName().toString());
       InfomallDocument doc;
       int i = 0;
       while ((doc = iter.next()) != null) {
