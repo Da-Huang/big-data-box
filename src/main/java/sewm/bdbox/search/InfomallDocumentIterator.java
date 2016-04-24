@@ -21,25 +21,22 @@ public class InfomallDocumentIterator {
   private static Logger logger = LogUtil
       .getLogger(InfomallDocumentIterator.class);
   private SeekableInputStream is;
-  private String path;
+  private String filename;
   private UniversalDetector detector = new UniversalDetector(null);
 
-  public InfomallDocumentIterator(SeekableInputStream is, String file) {
+  public InfomallDocumentIterator(SeekableInputStream is, String filename) {
     this.is = is;
-    this.path = file;
+    this.filename = filename;
   }
 
   public InfomallDocument next() {
-    String version = null;
-    String dateStr = null;
-    String url = null;
-    Date date = null;
-    Integer unzipLength = null;
-    Integer length = null;
-    String data = null;
-    Long position;
     try {
-      position = is.position();
+      Long position = is.position();
+      String version = null;
+      String url = null;
+      Date date = null;
+      Integer unzipLength = null;
+      Integer length = null;
       String line;
       while ((line = StreamUtil.readLine(is)) != null && !line.isEmpty()) {
         String item[] = line.split(": ", 2);
@@ -52,8 +49,7 @@ public class InfomallDocumentIterator {
         } else if (item[0].equals("url")) {
           url = item[1];
         } else if (item[0].equals("date")) {
-          dateStr = item[1];
-          date = parseDate(dateStr);
+          date = parseDate(item[1]);
         } else if (item[0].equals("unzip-length")) {
           unzipLength = new Integer(item[1]);
         } else if (item[0].equals("length")) {
@@ -92,17 +88,15 @@ public class InfomallDocumentIterator {
       StreamUtil.readLine(is);
 
       byte[] unzipBytes = JZlipUtil.decompress(bytes);
-      data = new String(unzipBytes);
-
       String charset = HtmlUtil.pCharset(detector, unzipBytes);
-      data = new String(unzipBytes, charset);
+      String html = new String(unzipBytes, charset);
 
-      String title = HtmlUtil.parseTitle(data);
-      String content = HtmlUtil.parseContent(data);
+      String title = HtmlUtil.parseTitle(html);
+      String content = HtmlUtil.parseContent(html);
       String host = HtmlUtil.parseHost(url);
-      InfomallDocument doc = new InfomallDocument(version, url, date, data,
-          position, charset, title, content, path, host);
-      return doc;
+
+      return new InfomallDocument(filename, position, version, url, host, date,
+          unzipBytes, html, charset, title, content);
     } catch (IOException e) {
       LogUtil.error(logger, e);
       return null;

@@ -19,6 +19,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.cjk.CJKAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
@@ -98,7 +99,7 @@ public class InfomallIndexer implements AutoCloseable {
     try (SeekableInputStream is = new SeekableFileInputStream(
         new File(file.toString()))) {
       InfomallDocumentIterator iter = new InfomallDocumentIterator(is,
-          file.toString());
+          file.getFileName().toString());
       InfomallDocument doc;
       while ((doc = iter.next()) != null) {
         indexDoc(doc);
@@ -113,17 +114,21 @@ public class InfomallIndexer implements AutoCloseable {
     }
   }
 
-  public boolean indexDoc(InfomallDocument doc) {
+  public boolean indexDoc(InfomallDocument infomallDoc) {
     try {
-      Document doc1 = new Document();
-      doc1.add(new StoredField("path", doc.getPath()));
-      doc1.add(new StoredField("position", doc.getPosition()));
-      doc1.add(new TextField("title", doc.getTitle(), Field.Store.NO));
-      doc1.add(new TextField("content", doc.getContent(), Field.Store.NO));
-      doc1.add(new StringField("url", doc.getUrl(), Field.Store.NO));
-      doc1.add(new StringField("version", doc.getVersion(), Field.Store.NO));
-      doc1.add(new StringField("host", doc.getHost(), Field.Store.NO));
-      writer.addDocument(doc1);
+      Document doc = new Document();
+      doc.add(new StoredField("filename", infomallDoc.getFilename()));
+      doc.add(new StoredField("position", infomallDoc.getPosition()));
+      doc.add(new StringField("url", infomallDoc.getUrl(), Field.Store.NO));
+      doc.add(new StringField("host", infomallDoc.getHost(), Field.Store.NO));
+      doc.add(new LongPoint("date", infomallDoc.getDate().getTime()));
+      Field titleField = new TextField("title", infomallDoc.getTitle(),
+          Field.Store.NO);
+      titleField.setBoost(5);
+      doc.add(titleField);
+      doc.add(
+          new TextField("content", infomallDoc.getContent(), Field.Store.NO));
+      writer.addDocument(doc);
       return true;
     } catch (IOException e) {
       LogUtil.error(logger, e);
