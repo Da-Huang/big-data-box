@@ -23,7 +23,7 @@ public class InfomallDocumentFetchUtil {
 
   public static InfomallDocument fetch(String infomallDataRoot, String filename,
       long position) {
-    String dir = filename.split(".", 3)[1];
+    String dir = filename.split("\\.", 3)[1];
     Path path = Paths.get(infomallDataRoot).resolve(dir).resolve(filename);
     try (SeekableInputStream is = new SeekableFileInputStream(
         new File(path.toUri()))) {

@@ -16,7 +16,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.logging.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.cjk.CJKAnalyzer;
+import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.LongPoint;
@@ -44,7 +44,7 @@ public class InfomallIndexer implements AutoCloseable {
   private Set<String> ignoredCollections = null;
 
   private InfomallIndexer(Builder builder) throws IOException {
-    Analyzer analyzer = new CJKAnalyzer();
+    Analyzer analyzer = new SmartChineseAnalyzer(true);
     IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
     iwc.setOpenMode(
         builder.create ? OpenMode.CREATE : OpenMode.CREATE_OR_APPEND);
@@ -127,10 +127,7 @@ public class InfomallIndexer implements AutoCloseable {
       doc.add(new StringField("url", infomallDoc.getUrl(), Field.Store.NO));
       doc.add(new StringField("host", infomallDoc.getHost(), Field.Store.NO));
       doc.add(new LongPoint("date", infomallDoc.getDate().getTime()));
-      Field titleField = new TextField("title", infomallDoc.getTitle(),
-          Field.Store.NO);
-      titleField.setBoost(5);
-      doc.add(titleField);
+      doc.add(new TextField("title", infomallDoc.getTitle(), Field.Store.NO));
       doc.add(
           new TextField("content", infomallDoc.getContent(), Field.Store.NO));
       writer.addDocument(doc);
