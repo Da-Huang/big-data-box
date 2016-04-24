@@ -135,6 +135,26 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>com.googlecode.maven-download-plugin</groupId>
+        <artifactId>download-maven-plugin</artifactId>
+        <version>1.3.0</version>
+        <executions>
+          <execution>
+            <id>install-jquery</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>wget</goal>
+            </goals>
+            <configuration>
+              <url>https://code.jquery.com/jquery-2.2.3.min.js</url>
+              <outputFileName>jquery.js</outputFileName>
+              <outputDirectory>${project.build.directory}/big-data-box/static/script</outputDirectory>
+              <outputDirectory>${project.basedir}/src/main/webapp/static/script</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>
