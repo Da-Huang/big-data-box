@@ -68,7 +68,7 @@ public class InfomallWebQueryUtil {
     if (textTitleQuery != null) {
       builder.add(textTitleQuery, Occur.SHOULD);
     }
-    Query textContentQuery = parseContentQuery(content);
+    Query textContentQuery = parseContentQuery(text);
     if (textContentQuery != null) {
       builder.add(textContentQuery, Occur.SHOULD);
     }
@@ -140,12 +140,12 @@ public class InfomallWebQueryUtil {
 
   public static int parseLimit(String limit) {
     if (limit == null) {
-      return 0;
+      return 20;
     }
     try {
       return Integer.parseInt(limit);
     } catch (NumberFormatException e) {
-      return 0;
+      return 20;
     }
   }
 }

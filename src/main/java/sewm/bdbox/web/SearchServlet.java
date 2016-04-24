@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 
+import sewm.bdbox.util.InfomallSearchUtil;
 import sewm.bdbox.util.InfomallWebQueryUtil;
 import sewm.bdbox.util.LogUtil;
 
@@ -53,6 +54,8 @@ public class SearchServlet extends HttpServlet {
     int limitInt = InfomallWebQueryUtil.parseLimit(limit);
     TopDocs top = WebSingleton.getInfomallSearcher().search(query,
         startInt + limitInt);
+    InfomallSearchUtil.writeResultAsJson(resp.getWriter(),
+        ContentServlet.DATA_ROOT_PATH, WebSingleton.getInfomallSearcher(), top);
   }
 
   public static void main(String[] args) {

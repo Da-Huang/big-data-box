@@ -18,7 +18,7 @@ public class ContentServlet extends HttpServlet {
   private static final Logger logger = LogUtil.getLogger(ContentServlet.class);
   private static final long serialVersionUID = 1L;
 
-  private static final String DATA_ROOT_PATH = WebSingleton.getProperties()
+  static final String DATA_ROOT_PATH = WebSingleton.getProperties()
       .getProperty("data");
 
   @Override
