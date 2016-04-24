@@ -82,7 +82,8 @@ public class InfomallIndexer implements AutoCloseable {
   private boolean processDocCollection(Path file) {
     if (file.getFileName().toString().startsWith(INFOMALL_COLLECTION_PREFIX)
         && !ignoredCollections.contains(file.getFileName().toString())) {
-      logger.info("Processing " + file.getFileName());
+      logger.info("Currently " + writer.numDocs()
+          + " documents indexed. Go on processing " + file.getFileName());
       int numDocs = writer.numDocs();
       boolean success = indexDocCollection(file);
       logger.info("Processed " + file.getFileName() + "["
@@ -146,6 +147,10 @@ public class InfomallIndexer implements AutoCloseable {
     } catch (IOException e) {
       LogUtil.error(logger, e);
     }
+  }
+
+  public int numDocs() {
+    return writer.numDocs();
   }
 
   public void flush() throws IOException {
@@ -255,6 +260,7 @@ public class InfomallIndexer implements AutoCloseable {
     try (InfomallIndexer indexer = builder.build()) {
       indexer.index(line.getOptionValue("data"));
       indexer.flush();
+      logger.info("Totally " + indexer.numDocs() + " document indexed.");
       indexer.writeIgnoredCollections(ignoredCollectionsFile);
     } catch (IOException e) {
       LogUtil.error(logger, e);

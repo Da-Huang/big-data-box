@@ -43,8 +43,10 @@ public class InfomallDocumentIterator {
       Date date = null;
       Integer unzipLength = null;
       Integer length = null;
+      boolean hasData = false;
       String line;
       while ((line = StreamUtil.readLine(is)) != null && !line.isEmpty()) {
+        hasData = true;
         String item[] = line.split(": ", 2);
         if (item.length != 2) {
           logger.warn("Length != 2");
@@ -65,6 +67,9 @@ public class InfomallDocumentIterator {
         }
       }
 
+      if (!hasData) {
+        return null;
+      }
       if (version == null) {
         logger.warn("Version not Found\n");
         return null;
