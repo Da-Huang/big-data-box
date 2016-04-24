@@ -2,11 +2,7 @@
  "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
  "http://java.sun.com/dtd/web-app_2_3.dtd" >
 <web-app>
-  <display-name>Archetype Created Web Application</display-name>
-  <servlet>
-    <servlet-name>HelloServlet</servlet-name>
-    <servlet-class>sewm.bdbox.web.HelloServlet</servlet-class>
-  </servlet>
+  <display-name>Big Data in Box</display-name>
   <servlet>
     <servlet-name>ContentServlet</servlet-name>
     <servlet-class>sewm.bdbox.web.ContentServlet</servlet-class>
@@ -18,10 +14,6 @@
   <servlet-mapping>
     <servlet-name>default</servlet-name>
     <url-pattern>/static/*</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>HelloServlet</servlet-name>
-    <url-pattern>/hello</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>ContentServlet</servlet-name>
