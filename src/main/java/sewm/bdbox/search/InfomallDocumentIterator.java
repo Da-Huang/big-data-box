@@ -2,8 +2,6 @@ package sewm.bdbox.search;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -95,7 +93,6 @@ public class InfomallDocumentIterator {
 
       byte[] unzipBytes = JZlipUtil.decompress(bytes);
       data = new String(unzipBytes);
-      Files.write(Paths.get("test.html"), unzipBytes);
 
       String charset = HtmlUtil.pCharset(detector, unzipBytes);
       data = new String(unzipBytes, charset);
@@ -103,7 +100,6 @@ public class InfomallDocumentIterator {
       String title = HtmlUtil.parseTitle(data);
       String content = HtmlUtil.parseContent(data);
       String host = HtmlUtil.parseHost(url);
-      logger.info(url);
       InfomallDocument doc = new InfomallDocument(version, url, date, data,
           position, charset, title, content, path, host);
       return doc;
@@ -126,8 +122,8 @@ public class InfomallDocumentIterator {
   }
 
   public static void main(String[] args) {
-    try (SeekableInputStream is = new SeekableFileInputStream(new File(
-        "F:/U200201/Web_Raw.U200201.0001"))) {
+    try (SeekableInputStream is = new SeekableFileInputStream(
+        new File("F:/U200201/Web_Raw.U200201.0001"))) {
       InfomallDocumentIterator iter = new InfomallDocumentIterator(is,
           "F:/U200201/Web_Raw.U200201.0001");
       InfomallDocument doc;
