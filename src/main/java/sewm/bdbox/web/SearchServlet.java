@@ -60,7 +60,4 @@ public class SearchServlet extends HttpServlet {
         ContentServlet.DATA_ROOT_PATH, WebSingleton.getInfomallSearcher(), top,
         startInt);
   }
-
-  public static void main(String[] args) {
-  }
 }
