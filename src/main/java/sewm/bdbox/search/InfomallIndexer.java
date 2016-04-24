@@ -52,7 +52,7 @@ public class InfomallIndexer implements AutoCloseable {
     ignoredCollections = builder.ignoredCollections;
   }
 
-  public boolean index(String dataPath, String indexPath) {
+  public boolean index(String dataPath) {
     return indexDocCollections(Paths.get(dataPath));
   }
 
@@ -61,7 +61,8 @@ public class InfomallIndexer implements AutoCloseable {
       try {
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
           @Override
-          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+          public FileVisitResult visitFile(Path file,
+              BasicFileAttributes attrs) {
             if (file.startsWith(INFOMALL_COLLECTION_PREFIX)
                 && ignoredCollections.contains(file.getFileName())) {
               indexDocCollection(file);
@@ -82,8 +83,8 @@ public class InfomallIndexer implements AutoCloseable {
   }
 
   private boolean indexDocCollection(Path file) {
-    try (SeekableInputStream is = new SeekableFileInputStream(new File(
-        file.toString()))) {
+    try (SeekableInputStream is = new SeekableFileInputStream(
+        new File(file.toString()))) {
       InfomallDocumentIterator iter = new InfomallDocumentIterator(is,
           file.toString());
       InfomallDocument doc;
@@ -127,7 +128,7 @@ public class InfomallIndexer implements AutoCloseable {
 
   public static class Builder {
     private String indexPath;
-    private double bufferSizeMB;
+    private double bufferSizeMB = 4096;
     private Set<String> ignoredCollections = new HashSet<String>();
 
     public Builder indexPath(String indexPath) {
@@ -147,11 +148,13 @@ public class InfomallIndexer implements AutoCloseable {
 
     public Builder ignoreCollections(String ignoredCollectionsFile) {
       try {
-        this.ignoredCollections = new HashSet<String>(Files.readAllLines(Paths
-            .get(ignoredCollectionsFile)));
+        this.ignoredCollections = new HashSet<String>(
+            Files.readAllLines(Paths.get(ignoredCollectionsFile)));
+        logger.info("Loaded " + this.ignoredCollections.size()
+            + " ignored collections from " + ignoredCollectionsFile);
       } catch (IOException e) {
         logger.warn(ignoredCollectionsFile
-            + "not found. Will not ignore any collection.");
+            + " not found. Will not ignore any collection.");
       }
       return this;
     }
@@ -167,27 +170,40 @@ public class InfomallIndexer implements AutoCloseable {
 
   public static void main(String[] args) {
     Options options = new Options();
-    options.addOption(Option.builder().longOpt("help")
-        .desc("Print help message.").build());
+    options.addOption(
+        Option.builder().longOpt("help").desc("Print help message.").build());
     options.addOption(Option.builder().longOpt("data").argName("path").hasArg()
         .desc("Data path.").build());
-    options.addOption(Option.builder().longOpt("index").argName("path")
-        .hasArg().desc("Index path.").build());
+    options.addOption(Option.builder().longOpt("index").argName("path").hasArg()
+        .desc("Index path.").build());
     options.addOption(Option.builder().longOpt("ignored_collections")
         .argName("path").hasArg().desc("Ignored collections path.").build());
+    options.addOption(Option.builder().longOpt("create")
+        .desc("Create new index. Otherwise, append data to the old index.")
+        .build());
+    options.addOption(Option.builder().longOpt("skip_confirmation")
+        .desc("Skip all confirmation.").build());
     CommandLine line = CommandlineUtil.parse(options, args);
 
     LogUtil.check(logger, line.hasOption("data"), "Missing --data.");
     LogUtil.check(logger, line.hasOption("index"), "Missing --index.");
-    InfomallIndexer.Builder builder = InfomallIndexer
-        .builder()
-        .indexPath(line.getOptionValue("data"))
-        .ignoreCollections(
-            line.getOptionValue("ignored_collections",
-                "ignored_collections.txt"));
+    if (!line.hasOption("skip_confirmation")) {
+      if (Files.exists(Paths.get(line.getOptionValue("index")))) {
+        CommandlineUtil.confirm(line.getOptionValue("index")
+            + " already exists. Are you sure to build index on it? [y/n]");
+      }
+      if (line.hasOption("create")) {
+        CommandlineUtil.confirm(
+            "create mode will overwrite the old index. Are you sure? [y/n]");
+      }
+    }
+
+    InfomallIndexer.Builder builder = InfomallIndexer.builder()
+        .indexPath(line.getOptionValue("index")).ignoreCollections(line
+            .getOptionValue("ignored_collections", "ignored_collections.txt"));
 
     try (InfomallIndexer indexer = builder.build()) {
-
+      indexer.index(line.getOptionValue("data"));
     } catch (IOException e) {
       LogUtil.error(logger, e);
     }
