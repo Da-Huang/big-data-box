@@ -83,12 +83,14 @@ public class HtmlUtil {
   }
 
   public static String parseContent(String data) {
+    data = data.replaceAll("(?is)^.*?<html", "<html");
     data = data.replaceAll("(?is)<head.*?>.*?</head>", " ");
     data = data.replaceAll("(?is)<script.*?>.*?</script>", " ");
     data = data.replaceAll("(?is)<style.*?>.*?</style>", " ");
     data = data.replaceAll("(?s)<\\w+?.*?>", " ");
     data = data.replaceAll("</\\w+?>", " ");
     data = data.replaceAll("(?s)<!.*?>", " ");
+    data = data.replaceAll("\\s+", " ");
     return data;
   }
 
