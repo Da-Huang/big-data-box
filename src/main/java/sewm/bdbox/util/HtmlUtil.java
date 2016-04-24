@@ -1,11 +1,17 @@
 package sewm.bdbox.util;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
 import org.apache.logging.log4j.Logger;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.mozilla.universalchardet.UniversalDetector;
 
 public class HtmlUtil {
@@ -62,17 +68,28 @@ public class HtmlUtil {
   }
 
   public static String parseTitle(String data) {
-    Document doc = Jsoup.parse(data);
-    String str = doc.title();
-    return str;
+    Pattern pattern =
+        Pattern.compile("<title\\s*>(?<title>.*?)</title>", Pattern.DOTALL
+            | Pattern.CASE_INSENSITIVE);
+    Matcher matcher = pattern.matcher(data);
+    StringBuilder sb = new StringBuilder();
+    while (matcher.find()) {
+      if (sb.length() > 0 && sb.charAt(sb.length() - 1) != ' ') {
+        sb.append(" ");
+      }
+      sb.append(matcher.group("title"));
+    }
+    return sb.toString();
   }
 
   public static String parseContent(String data) {
-    int i = data.indexOf("html");
-    data = data.substring(i + 5);
-    org.jsoup.nodes.Document doc = Jsoup.parse(data);
-    String str = doc.text();
-    return str;
+    data = data.replaceAll("(?is)<head.*?>.*?</head>", " ");
+    data = data.replaceAll("(?is)<script.*?>.*?</script>", " ");
+    data = data.replaceAll("(?is)<style.*?>.*?</style>", " ");
+    data = data.replaceAll("(?s)<\\w+?.*?>", " ");
+    data = data.replaceAll("</\\w+?>", " ");
+    data = data.replaceAll("(?s)<!.*?>", " ");
+    return data;
   }
 
   public static String parseHost(String url) {
@@ -84,6 +101,25 @@ public class HtmlUtil {
     } catch (MalformedURLException e) {
       LogUtil.error(logger, e);
       return null;
+    }
+  }
+
+  public static void main(String[] args) {
+    Options options = new Options();
+    options.addOption(Option.builder().longOpt("help")
+        .desc("Print help message.").build());
+    options.addOption(Option.builder().longOpt("file").argName("file").hasArg()
+        .desc("Data path.").build());
+    CommandLine line = CommandlineUtil.parse(options, args);
+
+    LogUtil.check(logger, line.hasOption("file"), "Missing --file.");
+
+    try {
+      String data =
+          new String(Files.readAllBytes(Paths.get(line.getOptionValue("file"))));
+      System.out.println(parseContent(data));
+    } catch (IOException e) {
+      LogUtil.error(logger, e);
     }
   }
 }
