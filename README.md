@@ -16,5 +16,8 @@ mvn eclipse:eclipse -Dwtpversion=2.0
 ---
 ## How to Run
 ```bash
-mvn exec:java -Dexec.classpathScope=compile -Dexec.mainClass=<package.MainClass> -Dexec.args="arg1 arg2 ..."
+export MAVEN_OPTS="-Xms4g -Xmx4g"
+
+# Build index
+mvn exec:java -Dexec.classpathScope=compile -Dexec.mainClass=sewm.bdbox.search.InfomallIndexer -Dexec.args="--data=/Volumes/HPT8_56T/data --index=/Volumes/HPT8_56T/index --create"
 ```

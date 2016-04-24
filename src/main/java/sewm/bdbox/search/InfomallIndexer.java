@@ -57,7 +57,7 @@ public class InfomallIndexer implements AutoCloseable {
     return indexDocCollections(Paths.get(dataPath));
   }
 
-  private boolean indexDocCollections(Path path) {
+  public boolean indexDocCollections(Path path) {
     if (Files.isDirectory(path)) {
       try {
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
@@ -94,7 +94,7 @@ public class InfomallIndexer implements AutoCloseable {
     }
   }
 
-  private boolean indexDocCollection(Path file) {
+  public boolean indexDocCollection(Path file) {
     try (SeekableInputStream is = new SeekableFileInputStream(
         new File(file.toString()))) {
       InfomallDocumentIterator iter = new InfomallDocumentIterator(is,
@@ -113,7 +113,7 @@ public class InfomallIndexer implements AutoCloseable {
     }
   }
 
-  private boolean indexDoc(InfomallDocument doc) {
+  public boolean indexDoc(InfomallDocument doc) {
     try {
       Document doc1 = new Document();
       doc1.add(new StoredField("path", doc.getPath()));
@@ -141,6 +141,10 @@ public class InfomallIndexer implements AutoCloseable {
     } catch (IOException e) {
       LogUtil.error(logger, e);
     }
+  }
+
+  public void flush() throws IOException {
+    writer.flush();
   }
 
   @Override
@@ -245,6 +249,7 @@ public class InfomallIndexer implements AutoCloseable {
 
     try (InfomallIndexer indexer = builder.build()) {
       indexer.index(line.getOptionValue("data"));
+      indexer.flush();
       indexer.writeIgnoredCollections(ignoredCollectionsFile);
     } catch (IOException e) {
       LogUtil.error(logger, e);

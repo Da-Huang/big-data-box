@@ -5,8 +5,7 @@
     <Console name="Console" target="SYSTEM_ERR">
       <ThresholdFilter level="trace" onMatch="ACCEPT"
         onMismatch="DENY" />
-      <PatternLayout
-        pattern="%p: %d{yyyy-MM-dd HH:mm:ss} [%t] %C:%M(%L): %msg%xEx%n" />
+      <PatternLayout pattern="%p: %d{yyyy-MM-dd HH:mm:ss} [%t] %C:%M(%L): %msg%xEx%n" />
     </Console>
   </appenders>
   <loggers>
