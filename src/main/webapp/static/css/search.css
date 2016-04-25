@@ -1,0 +1,33 @@
+.template {
+  display:none;
+}
+
+.advanced_search_options {
+  display:none;
+}
+
+.results_count {
+  display:none;
+}
+
+.results {
+  margin-top:60px;
+  margin-bottom:60px;
+}
+
+.result {
+  margin:23px 50px;
+}
+
+.result_title {
+  font-size:18px;
+}
+
+.result_url {
+  font-size:14px;
+  color:#006621;
+}
+
+.paging {
+  display:none;
+}

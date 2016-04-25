@@ -1,19 +1,44 @@
 <html>
 <head>
 <title>Search in the Box</title>
-<link rel='stylesheet' type='text/css' href='/big-data-box/static/css/main.css'>
+<link rel='stylesheet' type='text/css' href='/big-data-box/static/css/search.css'>
 <script src='/big-data-box/static/script/jquery.js'></script>
-<script src='/big-data-box/static/script/main.js'></script>
+<script src='/big-data-box/static/script/search.js'></script>
 </head>
 <body>
-<form>
-  <input class='start_date' />
-  <input class='end_date' />
-  <input class='url' />
-  <input class='host' />
-  <input class='text' />
-  <input class='title' />
-  <input class='content' />
+<form action='/big-data-box/search' class='search_form' method="get">
+  <div>
+    Text<input name='text' type='text'>
+    <button type='button' onclick='Search(0, RESULTS_EACH_PAGE)'>Search</button>
+    <a href='javascript:void(0)' onclick='ToggleOptions()'>More/Less Options</a>
+  </div>
+  <div class='advanced_search_options'>
+    <div>
+      Title<input name='title' type='text'>
+      Content<input name='content' type='text'>
+    </div>
+    <div>
+      Start Date<input name='start_date' type='date'>
+      End Date<input name='end_date' type='date'>
+    </div>
+    <div>
+      URL<input name='url' type='text'>
+      Host<input name='host' type='text'>
+    </div>
+  </div>
 </form>
+<div class='results_count'>Totally <span></span> results.</div>
+<div class='results'>
+  <div class='result template'>
+    <div class='result_title'><a target="_blank" href=''></a></div>
+    <div class='result_date'></div>
+    <div class='result_url'></div>
+  </div>
+</div>
+<div class='paging'>
+<span class='previous'>Previous</span>
+<span class='page template'></span>
+<span class='next'>Next</span>
+</div>
 </body>
 </html>

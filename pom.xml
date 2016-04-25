@@ -100,6 +100,26 @@
     <finalName>big-data-box</finalName>
     <plugins>
       <plugin>
+        <groupId>com.googlecode.maven-download-plugin</groupId>
+        <artifactId>download-maven-plugin</artifactId>
+        <version>1.3.0</version>
+        <executions>
+          <execution>
+            <id>install-jquery</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>wget</goal>
+            </goals>
+            <configuration>
+              <url>https://code.jquery.com/jquery-2.2.3.min.js</url>
+              <outputFileName>jquery.js</outputFileName>
+              <outputDirectory>${project.build.directory}/big-data-box/static/script</outputDirectory>
+              <outputDirectory>${project.basedir}/src/main/webapp/static/script</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <source>1.8</source>
@@ -144,24 +164,11 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>com.googlecode.maven-download-plugin</groupId>
-        <artifactId>download-maven-plugin</artifactId>
-        <version>1.3.0</version>
-        <executions>
-          <execution>
-            <id>install-jquery</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>wget</goal>
-            </goals>
-            <configuration>
-              <url>https://code.jquery.com/jquery-2.2.3.min.js</url>
-              <outputFileName>jquery.js</outputFileName>
-              <outputDirectory>${project.build.directory}/big-data-box/static/script</outputDirectory>
-              <outputDirectory>${project.basedir}/src/main/webapp/static/script</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
+        <groupId>org.mortbay.jetty</groupId>
+        <artifactId>maven-jetty-plugin</artifactId>
+        <configuration>
+          <scanIntervalSeconds>2</scanIntervalSeconds>
+        </configuration>
       </plugin>
     </plugins>
   </build>
