@@ -16,12 +16,14 @@ class WebSingleton {
   static Properties getProperties() {
     if (properties == null) {
       synchronized (Properties.class) {
-        try {
-          properties = new Properties();
-          properties.load(Thread.currentThread().getContextClassLoader()
-              .getResourceAsStream("config.properities"));
-        } catch (IOException e) {
-          e.printStackTrace();
+        if (properties == null) {
+          try {
+            properties = new Properties();
+            properties.load(Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream("config.properities"));
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
         }
       }
     }
