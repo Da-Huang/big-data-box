@@ -18,6 +18,9 @@ public class InfomallDocument {
   private String title;
   private String content;
 
+  private String ip;
+  private String origin;
+
   public InfomallDocument(String filename, Long position, String version,
       String url, String host, Date date, byte[] unzipBytes, String html,
       String charset, String title, String content) {

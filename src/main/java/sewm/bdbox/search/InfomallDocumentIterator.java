@@ -44,6 +44,10 @@ public class InfomallDocumentIterator {
       Integer unzipLength = null;
       Integer length = null;
       boolean hasData = false;
+
+      String ip = null;
+      String origin = null;
+
       String line;
       while ((line = StreamUtil.readLine(is)) != null && !line.isEmpty()) {
         hasData = true;
@@ -62,6 +66,10 @@ public class InfomallDocumentIterator {
           unzipLength = new Integer(item[1]);
         } else if (item[0].equals("length")) {
           length = new Integer(item[1]);
+        } else if (item[0].equals("ip")) {
+          ip = item[1];
+        } else if (item[0].equals("origin")) {
+          origin = item[1];
         } else {
           logger.warn("Type wrong\n");
         }
@@ -106,8 +114,12 @@ public class InfomallDocumentIterator {
       String content = HtmlUtil.parseContent(html);
       String host = HtmlUtil.parseHost(url);
 
-      return new InfomallDocument(filename, position, version, url, host, date,
-          unzipBytes, html, charset, title, content);
+      InfomallDocument doc = new InfomallDocument(filename, position, version,
+          url, host, date, unzipBytes, html, charset, title, content);
+      // Sets optional data.
+      doc.setIp(ip);
+      doc.setOrigin(origin);
+      return doc;
     } catch (IOException e) {
       LogUtil.error(logger, e);
       return null;

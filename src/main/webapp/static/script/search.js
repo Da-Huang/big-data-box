@@ -46,7 +46,8 @@ function _RenderPaging(start, limit, total_hits) {
 
 function _RenderTopDocs(top_docs) {
   console.log('Result', top_docs);
-  $('.results_count>span').text(top_docs.total_hits).show();
+  $('.results_count>span').text(top_docs.total_hits);
+  $('.results_count').show();
 
   $.each(top_docs.docs, function(i, doc) {
     var doc_node = $('.result.template').clone().removeClass('template');
