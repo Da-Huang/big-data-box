@@ -79,10 +79,10 @@ function _ParseQuery(form, start, limit) {
     query.content = content;
   }
   if (start_date) {
-    query.start_date = start_date;
+    query.start_date = new Date(start_date).getTime();
   }
   if (end_date) {
-    query.end_date = end_date;
+    query.end_date = new Date(end_date).getTime();
   }
   if (url) {
     query.url = url;
