@@ -36,6 +36,8 @@ import org.tukaani.xz.SeekableInputStream;
 
 import sewm.bdbox.util.CommandlineUtil;
 import sewm.bdbox.util.LogUtil;
+import sun.misc.Signal;
+import sun.misc.SignalHandler;
 
 public class InfomallIndexer implements AutoCloseable {
   private static final Logger logger = LogUtil.getLogger(InfomallIndexer.class);
@@ -47,6 +49,7 @@ public class InfomallIndexer implements AutoCloseable {
   protected Set<String> ignoredCollections = null;
 
   private List<Runnable> onCloseActions = new ArrayList<Runnable>();
+  private boolean stop = false;
 
   protected InfomallIndexer(Builder builder) throws IOException {
     Analyzer analyzer = new SmartChineseAnalyzer(true);
@@ -85,6 +88,10 @@ public class InfomallIndexer implements AutoCloseable {
   }
 
   protected boolean processDocCollection(Path file) {
+    if (stop) {
+      logger.info("Skipped " + file + ", as this writer has been stopped.");
+      return false;
+    }
     if (file.getFileName().toString().startsWith(INFOMALL_COLLECTION_PREFIX)
         && !ignoredCollections.contains(file.getFileName().toString())) {
       logger.info("Currently "
@@ -181,8 +188,9 @@ public class InfomallIndexer implements AutoCloseable {
     });
   }
 
-  public int numDocs() {
-    return writer.numDocs();
+  public void stop() {
+    stop = true;
+    logger.info("Stoping this writer.");
   }
 
   @Override
@@ -297,6 +305,11 @@ public class InfomallIndexer implements AutoCloseable {
     try (InfomallIndexer indexer = builder.build()) {
       indexer.index(line.getOptionValue("data"));
       indexer.onCloseWriteIgnoredCollections(ignoredCollectionsFile);
+      Signal.handle(new Signal("INT"), new SignalHandler () {
+        public void handle(Signal sig) {
+          indexer.stop();
+        }
+      });
     } catch (IOException e) {
       LogUtil.error(logger, e);
     }

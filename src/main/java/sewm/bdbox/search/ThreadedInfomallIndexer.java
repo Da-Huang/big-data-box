@@ -15,6 +15,8 @@ import org.apache.logging.log4j.Logger;
 
 import sewm.bdbox.util.CommandlineUtil;
 import sewm.bdbox.util.LogUtil;
+import sun.misc.Signal;
+import sun.misc.SignalHandler;
 
 public class ThreadedInfomallIndexer extends InfomallIndexer {
   private static final Logger logger = LogUtil
@@ -117,6 +119,11 @@ public class ThreadedInfomallIndexer extends InfomallIndexer {
     try (InfomallIndexer indexer = builder.build()) {
       indexer.index(line.getOptionValue("data"));
       indexer.onCloseWriteIgnoredCollections(ignoredCollectionsFile);
+      Signal.handle(new Signal("INT"), new SignalHandler () {
+        public void handle(Signal sig) {
+          indexer.stop();
+        }
+      });
     } catch (IOException e) {
       LogUtil.error(logger, e);
     }
