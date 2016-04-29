@@ -23,6 +23,9 @@ import sewm.bdbox.util.JZlipUtil;
 import sewm.bdbox.util.LogUtil;
 import sewm.bdbox.util.StreamUtil;
 
+/**
+ * This class is not thread-safe.
+ */
 public class InfomallDocumentIterator {
   private static final Logger logger = LogUtil
       .getLogger(InfomallDocumentIterator.class);

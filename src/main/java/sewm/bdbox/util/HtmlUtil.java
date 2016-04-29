@@ -23,7 +23,10 @@ public class HtmlUtil {
     detector.handleData(data, 0, data.length);
     detector.dataEnd();
     encoding = detector.getDetectedCharset();
-    return encoding != null ? encoding : "gb18030";
+    if (encoding == null || encoding.toLowerCase().contains("gb")) {
+      return "gb18030";
+    }
+    return encoding;
   }
 
   @SuppressWarnings("unused")

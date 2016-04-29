@@ -1,6 +1,8 @@
 package sewm.bdbox.search;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map.Entry;
 
 import lombok.Data;
 
@@ -20,6 +22,8 @@ public class InfomallDocument {
 
   private String ip;
   private String origin;
+
+  private List<Entry<String, String>> anchor;
 
   public InfomallDocument(String filename, Long position, String version,
       String url, String host, Date date, byte[] unzipBytes, String html,
