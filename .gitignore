@@ -4,6 +4,7 @@
 target
 
 *.class
+*.jar
 *.lock
 *.log
 *.log.gz
