@@ -6,8 +6,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map.Entry;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -117,11 +120,14 @@ public class InfomallDocumentIterator {
       String content = HtmlUtil.parseContent(html);
       String host = HtmlUtil.parseHost(url);
 
+      List<Entry<String, String>> ans = HtmlUtil.parseURL(html, host, url);
+
       InfomallDocument doc = new InfomallDocument(filename, position, version,
           url, host, date, unzipBytes, html, charset, title, content);
       // Sets optional data.
       doc.setIp(ip);
       doc.setOrigin(origin);
+      doc.setAnchor(ans); // set anchor
       return doc;
     } catch (IOException e) {
       LogUtil.error(logger, e);
@@ -143,8 +149,8 @@ public class InfomallDocumentIterator {
 
   public static void main(String[] args) {
     Options options = new Options();
-    options.addOption(
-        Option.builder().longOpt("help").desc("Print help message.").build());
+    options.addOption(Option.builder().longOpt("help")
+        .desc("Print help message.").build());
     options.addOption(Option.builder().longOpt("data").argName("file").hasArg()
         .desc("Data path.").build());
     CommandLine line = CommandlineUtil.parse(options, args);
@@ -152,17 +158,22 @@ public class InfomallDocumentIterator {
     LogUtil.check(logger, line.hasOption("data"), "Missing --data.");
 
     Path data = Paths.get(line.getOptionValue("data"));
-    try (SeekableInputStream is = new SeekableFileInputStream(
-        new File(data.toUri()))) {
-      InfomallDocumentIterator iter = new InfomallDocumentIterator(is,
-          data.getFileName().toString());
+    try (SeekableInputStream is = new SeekableFileInputStream(new File(
+        data.toUri()))) {
+      InfomallDocumentIterator iter = new InfomallDocumentIterator(is, data
+          .getFileName().toString());
       InfomallDocument doc;
       int i = 0;
       while ((doc = iter.next()) != null) {
-        logger.info(++i + ":" + doc.getPosition() + ": " + doc.getUrl());
+        // logger.info(++i + ":" + doc.getPosition() + ": " + doc.getUrl());
+        List<Entry<String, String>> ans = doc.getAnchor();
+        for (int f = 0; f < ans.size(); ++f) {
+          logger.info(ans.get(f));
+        }
       }
     } catch (IOException e) {
       LogUtil.error(logger, e);
     }
+
   }
 }
