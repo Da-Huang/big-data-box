@@ -117,6 +117,18 @@
               <outputDirectory>${project.basedir}/src/main/webapp/static/script</outputDirectory>
             </configuration>
           </execution>
+          <execution>
+            <id>install-sigma</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>wget</goal>
+            </goals>
+            <configuration>
+              <url>https://github.com/jacomyal/sigma.js/releases/download/v1.1.0/release-v1.1.0.zip</url>
+              <outputFileName>sigma.js.zip</outputFileName>
+              <outputDirectory>${project.build.directory}/zip</outputDirectory>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -133,14 +145,25 @@
         <version>2.10</version>
         <executions>
           <execution>
-            <id>copy-dependencies</id>
+            <id>copy-dependencies-to-lib</id>
             <phase>prepare-package</phase>
             <goals>
               <goal>copy-dependencies</goal>
             </goals>
             <configuration>
               <outputDirectory>${project.build.directory}/lib</outputDirectory>
-              <outputDirectory>${project.build.directory}/big-data-box/WEB-INF/lib</outputDirectory>
+              <overWriteReleases>false</overWriteReleases>
+              <overWriteSnapshots>false</overWriteSnapshots>
+              <overWriteIfNewer>true</overWriteIfNewer>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-dependencies-to-web-src-lib</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
               <outputDirectory>${project.basedir}/src/main/webapp/WEB-INF/lib</outputDirectory>
               <overWriteReleases>false</overWriteReleases>
               <overWriteSnapshots>false</overWriteSnapshots>
@@ -149,6 +172,25 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <id>unzip-sigma.js</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <unzip src="${project.build.directory}/zip/sigma.js.zip" dest="${project.basedir}/src/main/webapp/static/script/sigma"/>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -166,7 +208,7 @@
       <plugin>
         <groupId>org.mortbay.jetty</groupId>
         <artifactId>maven-jetty-plugin</artifactId>
-        <version>6.1.26</version>
+        <version>7.1.26</version>
         <configuration>
           <scanIntervalSeconds>2</scanIntervalSeconds>
         </configuration>
