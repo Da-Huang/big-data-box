@@ -1,21 +1,15 @@
 package sewm.bdbox.util;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.net.ssl.HostnameVerifier;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -80,8 +74,9 @@ public class HtmlUtil {
   }
 
   public static String parseTitle(String data) {
-    Pattern pattern = Pattern.compile("<title\\s*>(?<title>.*?)</title>",
-        Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+    Pattern pattern =
+        Pattern.compile("<title\\s*>(?<title>.*?)</title>",
+            Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
     Matcher matcher = pattern.matcher(data);
     StringBuilder sb = new StringBuilder();
     while (matcher.find()) {
@@ -93,11 +88,27 @@ public class HtmlUtil {
     return sb.toString();
   }
 
+  private static Pattern IMG_PATTERN =
+      Pattern.compile("<img\\s.*?(alt=(?<text>'.*?'|\".*?\"))?.*?>",
+          Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+
   public static String parseContent(String data) {
     data = data.replaceAll("(?is)^.*?<html", "<html");
     data = data.replaceAll("(?is)<head.*?>.*?</head>", " ");
     data = data.replaceAll("(?is)<script.*?>.*?</script>", " ");
     data = data.replaceAll("(?is)<style.*?>.*?</style>", " ");
+
+    Matcher imgMatcher = IMG_PATTERN.matcher(data);
+    StringBuffer sb = new StringBuffer();
+    while (imgMatcher.find()) {
+      String replacement = imgMatcher.group("text");
+      replacement =
+          " " + replacement.substring(1, replacement.length() - 1) + " ";
+      imgMatcher.appendReplacement(sb, replacement);
+    }
+    imgMatcher.appendTail(sb);
+    data = sb.toString();
+
     data = data.replaceAll("(?s)<\\w+?.*?>", " ");
     data = data.replaceAll("</\\w+?>", " ");
     data = data.replaceAll("(?s)<!.*?>", " ");
@@ -117,20 +128,22 @@ public class HtmlUtil {
     }
   }
 
-  public static List<Entry<String, String>> parseURL(String data, String host,
-      String url) {
+  private static Pattern A_PATTERN =
+      Pattern.compile("<a(?<attr>.*?)>(?<aparse>.*?)</a>",
+          Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+  private static Pattern HREF_PATTERN =
+      Pattern.compile("href=(?<url>'.*?'|\".*?\")",
+          Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+
+  public static List<Entry<String, String>> parseURL(
+      String data, String host, String url) {
     List<Entry<String, String>> ans = new ArrayList<Entry<String, String>>();
-    Pattern pattern = Pattern.compile("<a(?<attr>.*?)>(?<aparse>.*?)</a>",
-        Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
-    Pattern pattern2 = Pattern.compile("href=(?<url>'.*?'|\".*?\")",
-        Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
-    ans.add(new SimpleEntry<String, String>("", ""));
-    Matcher matcher = pattern.matcher(data);
+    Matcher matcher = A_PATTERN.matcher(data);
 
     while (matcher.find()) {
       String aparse = matcher.group("aparse");
       aparse = parseContent(aparse);
-      Matcher matcher2 = pattern2.matcher(matcher.group("attr"));
+      Matcher matcher2 = HREF_PATTERN.matcher(matcher.group("attr"));
       if (matcher2.find()) {
         String urlString = matcher2.group("url");
         if (urlString.isEmpty())
@@ -147,7 +160,7 @@ public class HtmlUtil {
     if (data.isEmpty())
       return null;
     if (data.subSequence(0, 1).equals("h")) {
-      data = data.replaceAll("(?is)^.*?(http://|https://)", "");
+      data = data.replaceAll("(?is)^.*?(https?://)", "");
       return data;
     }
     if (data.subSequence(0, 1).equals("/")) {
@@ -166,8 +179,8 @@ public class HtmlUtil {
 
   public static void main(String[] args) {
     Options options = new Options();
-    options.addOption(Option.builder().longOpt("help")
-        .desc("Print help message.").build());
+    options.addOption(
+        Option.builder().longOpt("help").desc("Print help message.").build());
     options.addOption(Option.builder().longOpt("file").argName("file").hasArg()
         .desc("Data path.").build());
     CommandLine line = CommandlineUtil.parse(options, args);
@@ -175,9 +188,12 @@ public class HtmlUtil {
     LogUtil.check(logger, line.hasOption("file"), "Missing --file.");
 
     try {
-      String data = new String(Files.readAllBytes(Paths.get(line
-          .getOptionValue("file"))));
-    } catch (IOException e) {
+      // String data = new String(Files.readAllBytes(Paths.get(line
+      // .getOptionValue("file"))));
+      String data =
+          "<html><img>xxtt</img><img alt='haha'></img>gg<img alt=\"haha\" dsf>xxx</img>moma</html>";
+      System.out.println(HtmlUtil.parseContent(data));
+    } catch (Exception e) {
       LogUtil.error(logger, e);
     }
   }
