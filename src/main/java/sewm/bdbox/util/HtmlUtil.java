@@ -75,9 +75,8 @@ public class HtmlUtil {
   }
 
   public static String parseTitle(String data) {
-    Pattern pattern =
-        Pattern.compile("<title\\s*>(?<title>.*?)</title>",
-            Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+    Pattern pattern = Pattern.compile("<title\\s*>(?<title>.*?)</title>",
+        Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
     Matcher matcher = pattern.matcher(data);
     StringBuilder sb = new StringBuilder();
     while (matcher.find()) {
@@ -89,9 +88,9 @@ public class HtmlUtil {
     return sb.toString();
   }
 
-  private static Pattern IMG_PATTERN =
-      Pattern.compile("<img\\s.*?(alt=(?<text>'.*?'|\".*?\"))?.*?>",
-          Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+  private static Pattern IMG_PATTERN = Pattern.compile(
+      "<img\\s.*?(alt=(?<text>'.*?'|\".*?\"))?.*?>", Pattern.DOTALL
+          | Pattern.CASE_INSENSITIVE);
 
   public static String parseContent(String data) {
     data = data.replaceAll("(?is)^.*?<html", "<html");
@@ -104,8 +103,8 @@ public class HtmlUtil {
     while (imgMatcher.find()) {
       String replacement = imgMatcher.group("text");
       if (replacement != null) {
-        replacement =
-            " " + replacement.substring(1, replacement.length() - 1) + " ";
+        replacement = " " + replacement.substring(1, replacement.length() - 1)
+            + " ";
         imgMatcher.appendReplacement(sb, replacement);
       }
     }
@@ -131,15 +130,14 @@ public class HtmlUtil {
     }
   }
 
-  private static Pattern A_PATTERN =
-      Pattern.compile("<a(?<attr>.*?)>(?<aparse>.*?)</a>",
-          Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
-  private static Pattern HREF_PATTERN =
-      Pattern.compile("href=(?<url>'.*?'|\".*?\")",
-          Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+  private static Pattern A_PATTERN = Pattern.compile(
+      "<a(?<attr>.*?)>(?<aparse>.*?)</a>", Pattern.DOTALL
+          | Pattern.CASE_INSENSITIVE);
+  private static Pattern HREF_PATTERN = Pattern.compile(
+      "href=(?<url>'.*?'|\".*?\")", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 
-  public static List<Entry<String, String>> parseURL(
-      String data, String host, String url) {
+  public static List<Entry<String, String>> parseURL(String data, String host,
+      String url) {
     List<Entry<String, String>> ans = new ArrayList<Entry<String, String>>();
     host = host.replaceAll("(?is)^https?://", "");
     url = url.replaceAll("(?is)^https?://", "");
@@ -149,63 +147,67 @@ public class HtmlUtil {
       String aparse = matcher.group("aparse");
       aparse = parseContent(aparse);
       aparse = aparse.trim();
-      if(aparse.isEmpty())continue;
+      if (aparse.isEmpty())
+        continue;
       Matcher matcher2 = HREF_PATTERN.matcher(matcher.group("attr"));
       if (matcher2.find()) {
         String urlString = matcher2.group("url");
         urlString = extract(urlString, host, url);
-        if(urlString == null || urlString.isEmpty())continue;
+        if (urlString == null || urlString.isEmpty())
+          continue;
         ans.add(new SimpleEntry<String, String>(urlString, aparse));
       }
     }
     return ans;
   }
 
-
   public static String extract(String data, String host, String url) {
     data = data.substring(1, data.length() - 1);
-   
+
     if (data.startsWith("javascript"))
       return "";
-    if (data.startsWith("h")) {
-      data = data.replaceAll("(?is)^https?://", "");
-    }
-    else if (data.startsWith("/")) {
+    if (data.startsWith("/")) {
       data = host.concat(data);
-    }
-    else if (!url.endsWith("/")) {
+    } else if (!url.endsWith("/")) {
       data = url.concat(data);
     }
-    data = simplify(data);
-    data = data.trim();
+    data = normalize(data);
     return data;
   }
-  
-  public static String simplify(String data)
-  {
+
+  public static String simplify(String data) {
     String item[] = data.split("/");
     Stack<String> stack = new Stack<String>();
-    
-    for(int i = 0; i < item.length;++i)
-    {
-      if(item[i].equals(".")||item[i].equals(" "))
+
+    for (int i = 0; i < item.length; ++i) {
+      if (item[i].equals(".") || item[i].equals(" "))
         continue;
-      if(item[i].equals(".."))
-      {
-        if(!stack.isEmpty()) stack.pop();
+      if (item[i].equals("..")) {
+        if (!stack.isEmpty())
+          stack.pop();
         continue;
       }
       stack.add(item[i]);
-    } 
+    }
     String reString = String.join("/", stack);
     reString.trim();
     return reString;
   }
+  
+  public static String normalize(String data)
+  {
+    data = data.replaceAll("(?is)^https?://", "");
+    data = simplify(data);
+    data = data.replaceAll("(?is)^www.", "");
+    data = data.replaceAll("[^0-9a-zA-Z]+", " ");
+    data = data.trim();
+    return data;
+  }
 
   public static void main(String[] args) {
     Options options = new Options();
-    options.addOption(
-        Option.builder().longOpt("help").desc("Print help message.").build());
+    options.addOption(Option.builder().longOpt("help")
+        .desc("Print help message.").build());
     options.addOption(Option.builder().longOpt("file").argName("file").hasArg()
         .desc("Data path.").build());
     CommandLine line = CommandlineUtil.parse(options, args);
@@ -215,8 +217,7 @@ public class HtmlUtil {
     try {
       // String data = new String(Files.readAllBytes(Paths.get(line
       // .getOptionValue("file"))));
-      String data =
-          "202.102.148.186/oldNews/2001/12x/2420.htm/../../../yiliaobaojian/baojian.htm";
+      String data = "202.102.148.186/oldNews/2001/12x/2420.htm/../../../yiliaobaojian/baojian.htm";
       System.out.println(HtmlUtil.simplify(data));
     } catch (Exception e) {
       LogUtil.error(logger, e);
