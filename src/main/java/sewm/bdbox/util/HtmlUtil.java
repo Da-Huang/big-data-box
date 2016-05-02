@@ -8,6 +8,7 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -102,9 +103,11 @@ public class HtmlUtil {
     StringBuffer sb = new StringBuffer();
     while (imgMatcher.find()) {
       String replacement = imgMatcher.group("text");
-      replacement =
-          " " + replacement.substring(1, replacement.length() - 1) + " ";
-      imgMatcher.appendReplacement(sb, replacement);
+      if (replacement != null) {
+        replacement =
+            " " + replacement.substring(1, replacement.length() - 1) + " ";
+        imgMatcher.appendReplacement(sb, replacement);
+      }
     }
     imgMatcher.appendTail(sb);
     data = sb.toString();
@@ -138,43 +141,65 @@ public class HtmlUtil {
   public static List<Entry<String, String>> parseURL(
       String data, String host, String url) {
     List<Entry<String, String>> ans = new ArrayList<Entry<String, String>>();
+    host = host.replaceAll("(?is)^https?://", "");
+    url = url.replaceAll("(?is)^https?://", "");
     Matcher matcher = A_PATTERN.matcher(data);
 
     while (matcher.find()) {
       String aparse = matcher.group("aparse");
       aparse = parseContent(aparse);
+      aparse = aparse.trim();
+      if(aparse.isEmpty())continue;
       Matcher matcher2 = HREF_PATTERN.matcher(matcher.group("attr"));
       if (matcher2.find()) {
         String urlString = matcher2.group("url");
-        if (urlString.isEmpty())
-          continue;
-        urlString = urlString.substring(1, urlString.length() - 1);
-        urlString = normalize(urlString, host, url);
+        urlString = extract(urlString, host, url);
+        if(urlString == null || urlString.isEmpty())continue;
         ans.add(new SimpleEntry<String, String>(urlString, aparse));
       }
     }
     return ans;
   }
 
-  public static String normalize(String data, String host, String url) {
-    if (data.isEmpty())
-      return null;
-    if (data.subSequence(0, 1).equals("h")) {
-      data = data.replaceAll("(?is)^.*?(https?://)", "");
-      return data;
+
+  public static String extract(String data, String host, String url) {
+    data = data.substring(1, data.length() - 1);
+   
+    if (data.startsWith("javascript"))
+      return "";
+    if (data.startsWith("h")) {
+      data = data.replaceAll("(?is)^https?://", "");
     }
-    if (data.subSequence(0, 1).equals("/")) {
-      if (host.subSequence(host.length() - 1, host.length()).equals("/")) {
-        host = host.substring(0, host.length() - 1);
-      }
+    else if (data.startsWith("/")) {
       data = host.concat(data);
-      return data;
     }
-    if (!url.subSequence(host.length() - 1, host.length()).equals("/")) {
-      url = url.concat("/");
+    else if (!url.endsWith("/")) {
+      data = url.concat(data);
     }
-    data = url.concat(data);
+    data = simplify(data);
+    data = data.trim();
     return data;
+  }
+  
+  public static String simplify(String data)
+  {
+    String item[] = data.split("/");
+    Stack<String> stack = new Stack<String>();
+    
+    for(int i = 0; i < item.length;++i)
+    {
+      if(item[i].equals(".")||item[i].equals(" "))
+        continue;
+      if(item[i].equals(".."))
+      {
+        if(!stack.isEmpty()) stack.pop();
+        continue;
+      }
+      stack.add(item[i]);
+    } 
+    String reString = String.join("/", stack);
+    reString.trim();
+    return reString;
   }
 
   public static void main(String[] args) {
@@ -191,8 +216,8 @@ public class HtmlUtil {
       // String data = new String(Files.readAllBytes(Paths.get(line
       // .getOptionValue("file"))));
       String data =
-          "<html><img>xxtt</img><img alt='haha'></img>gg<img alt=\"haha\" dsf>xxx</img>moma</html>";
-      System.out.println(HtmlUtil.parseContent(data));
+          "202.102.148.186/oldNews/2001/12x/2420.htm/../../../yiliaobaojian/baojian.htm";
+      System.out.println(HtmlUtil.simplify(data));
     } catch (Exception e) {
       LogUtil.error(logger, e);
     }
