@@ -57,7 +57,7 @@ public class SearchServlet extends HttpServlet {
     TopDocs top = WebSingleton.getInfomallSearcher().search(query,
         startInt + limitInt);
     InfomallSearchUtil.writeResultAsJson(resp.getWriter(),
-        ContentServlet.DATA_ROOT_PATH, WebSingleton.getInfomallSearcher(), top,
+        ContentServlet.DATA_MAP, WebSingleton.getInfomallSearcher(), top,
         startInt);
   }
 }

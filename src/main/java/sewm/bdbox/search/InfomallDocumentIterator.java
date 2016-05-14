@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -163,7 +162,7 @@ public class InfomallDocumentIterator {
       InfomallDocumentIterator iter = new InfomallDocumentIterator(is,
           data.getFileName().toString());
       InfomallDocument doc;
-      int i = 0;
+      // int i = 0;
       while ((doc = iter.next()) != null) {
         // logger.info(++i + ":" + doc.getPosition() + ": " + doc.getUrl());
         List<Entry<String, String>> ans = doc.getAnchor();

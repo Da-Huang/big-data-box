@@ -2,6 +2,7 @@ package sewm.bdbox.search;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -67,8 +68,8 @@ public class InfomallSearcher implements AutoCloseable {
     Options options = new Options();
     options.addOption(
         Option.builder().longOpt("help").desc("Print help message.").build());
-    options.addOption(Option.builder().longOpt("data").argName("path").hasArg()
-        .desc("Data root path.").build());
+    options.addOption(Option.builder().longOpt("data_map").argName("path")
+        .hasArg().desc("Data mapping path.").build());
     options.addOption(Option.builder().longOpt("index").argName("dir").hasArg()
         .desc("Index path.").build());
     options.addOption(Option.builder().longOpt("query").argName("string")
@@ -78,7 +79,7 @@ public class InfomallSearcher implements AutoCloseable {
     CommandLine line = CommandlineUtil.parse(options, args);
 
     LogUtil.check(logger, line.hasOption("index"), "Missing --index.");
-    LogUtil.check(logger, line.hasOption("data"), "Missing --data.");
+    LogUtil.check(logger, line.hasOption("data_map"), "Missing --data_map.");
     LogUtil.check(logger, line.hasOption("query"), "Missing --query.");
 
     int limit = Integer.getInteger(line.getOptionValue("limit"), 10);
@@ -87,6 +88,9 @@ public class InfomallSearcher implements AutoCloseable {
     QueryParser contentParser = new QueryParser("content", analyzer);
     try (InfomallSearcher searcher = new InfomallSearcher(
         line.getOptionValue("index"))) {
+      Map<String, String> dataMap = InfomallFetchUtil
+          .loadDataMap(Paths.get(line.getOptionValue("data_map")));
+
       BooleanQuery.Builder builder = new BooleanQuery.Builder();
       builder.add(
           new BoostQuery(titleParser.parse(line.getOptionValue("query")), 10),
@@ -99,11 +103,16 @@ public class InfomallSearcher implements AutoCloseable {
       logger.info("Hit " + top.totalHits + " documents.");
       for (ScoreDoc scoreDoc : top.scoreDocs) {
         Document doc = searcher.doc(scoreDoc.doc);
-        logger.info(doc.get("filename") + ", " + doc.get("position"));
-        InfomallDocument infomallDoc = InfomallFetchUtil.fetch(
-            line.getOptionValue("data"), doc.get("filename"),
-            doc.get("position"));
-        logger.info(infomallDoc.getUrl() + " " + infomallDoc.getTitle());
+        final String filename = doc.get("filename");
+        final String position = doc.get("position");
+        InfomallDocument infomallDoc = InfomallFetchUtil.fetch(dataMap,
+            filename, position);
+        if (infomallDoc != null) {
+          logger.info(infomallDoc.getUrl() + " " + infomallDoc.getTitle());
+        } else {
+          logger.info(
+              String.format("Failed to fetch %s(%s).", filename, position));
+        }
       }
     } catch (Exception e) {
       LogUtil.error(logger, e);

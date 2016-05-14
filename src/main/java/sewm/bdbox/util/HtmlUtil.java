@@ -2,8 +2,6 @@ package sewm.bdbox.util;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +59,6 @@ public class HtmlUtil {
       }
 
       String item[] = s.split(" |;|'|\"", 2);
-      // logger.info(item[0]);
       if (item[0].isEmpty()) {
         return "gb18030";
       } else if (item[0].subSequence(0, 2).equals("gb"))

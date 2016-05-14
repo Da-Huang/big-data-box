@@ -1,6 +1,8 @@
 package sewm.bdbox.web;
 
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -18,8 +20,10 @@ public class ContentServlet extends HttpServlet {
   private static final Logger logger = LogUtil.getLogger(ContentServlet.class);
   private static final long serialVersionUID = 1L;
 
-  static final String DATA_ROOT_PATH = WebSingleton.getProperties()
-      .getProperty("data");
+  static final String DATA_MAP_PATH = WebSingleton.getProperties()
+      .getProperty("data_map");
+  static final Map<String, String> DATA_MAP = InfomallFetchUtil
+      .loadDataMap(Paths.get(DATA_MAP_PATH));
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -36,7 +40,7 @@ public class ContentServlet extends HttpServlet {
     try {
       int id = Integer.parseInt(idStr);
       Document doc = WebSingleton.getInfomallSearcher().doc(id);
-      InfomallDocument infomallDoc = InfomallFetchUtil.fetch(DATA_ROOT_PATH,
+      InfomallDocument infomallDoc = InfomallFetchUtil.fetch(DATA_MAP,
           doc.get("filename"), Long.parseLong(doc.get("position")));
       resp.getOutputStream().write(infomallDoc.getUnzipBytes());
     } catch (NumberFormatException e) {
