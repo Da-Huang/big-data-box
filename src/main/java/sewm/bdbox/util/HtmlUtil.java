@@ -92,6 +92,7 @@ public class HtmlUtil {
       Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 
   public static String parseContent(String data) {
+    data = data.replaceAll("\\s+>", ">");
     data = data.replaceAll("(?is)^.*?<html", "<html");
     data = data.replaceAll("(?is)<head.*?>.*?</head>", " ");
     data = SCRIPT_PATTERN.matcher(data).replaceAll(" ");
@@ -138,6 +139,7 @@ public class HtmlUtil {
   public static List<Entry<String, String>> parseAnchors(String data,
       String host, String url) {
     // Removed script first.
+    data = data.replaceAll("\\s+>", ">");
     data = SCRIPT_PATTERN.matcher(data).replaceAll(" ");
 
     List<Entry<String, String>> anchors = new ArrayList<Entry<String, String>>();
@@ -149,6 +151,7 @@ public class HtmlUtil {
       if (atext.isEmpty()) {
         continue;
       }
+
       Matcher hrefMatcher = HREF_PATTERN.matcher(matcher.group("attr"));
       if (hrefMatcher.find()) {
         String href = hrefMatcher.group("url");
@@ -200,14 +203,14 @@ public class HtmlUtil {
     return String.join("/", stack);
   }
 
-  public static String normalizeURL(String data) {
-    data = data.replaceAll("(?is)^.*https?://", "");
-    data = simplifyUrlPath(data);
-    data = data.replaceAll("(?is)^www.", "");
-    data = data.replaceAll("\\p{Punct}", " ");
-    data = data.replaceAll("\\s+", " ");
-    data = data.trim();
-    return data;
+  public static String normalizeURL(String url) {
+    url = url.replaceAll("(?is)^.*https?://", "");
+    url = simplifyUrlPath(url);
+    url = url.replaceAll("(?is)^www.", "");
+    url = url.replaceAll("\\p{Punct}", " ");
+    url = url.replaceAll("\\s+", " ");
+    url = url.trim();
+    return url;
   }
 
   public static void main(String[] args) {
