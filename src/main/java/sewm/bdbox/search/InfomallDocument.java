@@ -23,6 +23,7 @@ public class InfomallDocument {
   private String ip;
   private String origin;
 
+  // Key: Anchor Text, Value: Raw URL.
   private List<Entry<String, String>> anchor;
 
   public InfomallDocument(String filename, Long position, String version,

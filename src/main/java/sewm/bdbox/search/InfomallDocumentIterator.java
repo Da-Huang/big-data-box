@@ -8,7 +8,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map.Entry;
 
 import org.apache.commons.cli.CommandLine;
@@ -119,7 +118,7 @@ public class InfomallDocumentIterator {
       String content = HtmlUtil.parseContent(html);
       String host = HtmlUtil.parseHost(url);
 
-      List<Entry<String, String>> ans = HtmlUtil.parseURL(html, host, url);
+      List<Entry<String, String>> ans = HtmlUtil.parseAnchors(html, host, url);
 
       InfomallDocument doc = new InfomallDocument(filename, position, version,
           url, host, date, unzipBytes, html, charset, title, content);
@@ -136,7 +135,7 @@ public class InfomallDocumentIterator {
 
   private static Date parseDate(String dateStr) {
     String pattern = "EEE, dd MMM yyyy HH:mm:ss z";
-    DateFormat sdf = new SimpleDateFormat(pattern, Locale.US);
+    DateFormat sdf = new SimpleDateFormat(pattern);
     try {
       Date date = sdf.parse(dateStr);
       return date;

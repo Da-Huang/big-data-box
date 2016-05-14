@@ -128,42 +128,43 @@ public class HtmlUtil {
   }
 
   private static Pattern A_PATTERN = Pattern.compile(
-      "<a(?<attr>.*?)>(?<aparse>.*?)</a>",
+      "<a(?<attr>.*?)>(?<atext>.*?)</a>",
       Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
   private static Pattern HREF_PATTERN = Pattern.compile(
       "href=(?<url>'.*?'|\".*?\")", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 
-  public static List<Entry<String, String>> parseURL(String data, String host,
-      String url) {
-    List<Entry<String, String>> ans = new ArrayList<Entry<String, String>>();
+  public static List<Entry<String, String>> parseAnchors(String data,
+      String host, String url) {
+    List<Entry<String, String>> anchors = new ArrayList<Entry<String, String>>();
     host = host.replaceAll("(?is)^https?://", "");
     url = url.replaceAll("(?is)^https?://", "");
     Matcher matcher = A_PATTERN.matcher(data);
 
     while (matcher.find()) {
-      String aparse = matcher.group("aparse");
-      aparse = parseContent(aparse);
-      aparse = aparse.trim();
-      if (aparse.isEmpty())
+      String atext = matcher.group("atext");
+      atext = parseContent(atext);
+      atext = atext.trim();
+      if (atext.isEmpty()) {
         continue;
+      }
       Matcher matcher2 = HREF_PATTERN.matcher(matcher.group("attr"));
       if (matcher2.find()) {
         String urlString = matcher2.group("url");
         urlString = extract(urlString, host, url);
         if (urlString == null || urlString.isEmpty())
           continue;
-        ans.add(new SimpleEntry<String, String>(urlString, aparse));
+        anchors.add(new SimpleEntry<String, String>(urlString, atext));
       }
     }
-    return ans;
+    return anchors;
   }
 
-  public static String extract(String data, String host, String url) {
+  private static String extract(String data, String host, String url) {
     data = data.substring(1, data.length() - 1);
 
-    if (data.startsWith("javascript"))
-      return "";
-    if (data.startsWith("/")) {
+    if (data.startsWith("javascript")) {
+      return null;
+    } else if (data.startsWith("/")) {
       data = host.concat(data);
     } else if (!url.endsWith("/")) {
       data = url.concat(data);
@@ -172,30 +173,31 @@ public class HtmlUtil {
     return data;
   }
 
-  public static String simplify(String data) {
-    String item[] = data.split("/");
+  private static String simplifyUrlPath(String data) {
+    String[] items = data.split("/");
     Stack<String> stack = new Stack<String>();
 
-    for (int i = 0; i < item.length; ++i) {
-      if (item[i].equals(".") || item[i].equals(" "))
+    for (String item : items) {
+      if (item.isEmpty() || item.equals(".")) {
         continue;
-      if (item[i].equals("..")) {
-        if (!stack.isEmpty())
+      } else if (item.equals("..")) {
+        // The first item is host name instead of a part of path.
+        if (stack.size() > 1) {
           stack.pop();
-        continue;
+        }
+      } else {
+        stack.push(item);
       }
-      stack.add(item[i]);
     }
-    String reString = String.join("/", stack);
-    reString.trim();
-    return reString;
+    return String.join("/", stack);
   }
 
-  public static String normalize(String data) {
-    data = data.replaceAll("(?is)^https?://", "");
-    data = simplify(data);
+  static String normalize(String data) {
+    data = data.replaceAll("(?is)^.*https?://", "");
+    data = simplifyUrlPath(data);
     data = data.replaceAll("(?is)^www.", "");
-    data = data.replaceAll("[^0-9a-zA-Z]+", " ");
+    data = data.replaceAll("\\p{Punct}", " ");
+    data = data.replaceAll("\\s+", " ");
     data = data.trim();
     return data;
   }
@@ -213,8 +215,8 @@ public class HtmlUtil {
     try {
       // String data = new String(Files.readAllBytes(Paths.get(line
       // .getOptionValue("file"))));
-      String data = "202.102.148.186/oldNews/2001/12x/2420.htm/../../../yiliaobaojian/baojian.htm";
-      System.out.println(HtmlUtil.simplify(data));
+      String data = "202.102.148.186/?oldNews/2001/12x/2420.htm/../../..//yiliao-b,a&o-%j#i'a\"n/baojian.htm";
+      System.out.println(HtmlUtil.normalize(data));
     } catch (Exception e) {
       LogUtil.error(logger, e);
     }
