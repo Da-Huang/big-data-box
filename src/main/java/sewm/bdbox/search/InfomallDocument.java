@@ -8,6 +8,7 @@ import lombok.Data;
 
 @Data
 public class InfomallDocument {
+  // Required.
   private String filename;
   private Long position;
   private String version;
@@ -20,25 +21,9 @@ public class InfomallDocument {
   private String title;
   private String content;
 
+  // Optional.
   private String ip;
   private String origin;
-
   // Key: Anchor Text, Value: Raw URL.
-  private List<Entry<String, String>> anchor;
-
-  public InfomallDocument(String filename, Long position, String version,
-      String url, String host, Date date, byte[] unzipBytes, String html,
-      String charset, String title, String content) {
-    this.filename = filename;
-    this.position = position;
-    this.version = version;
-    this.url = url;
-    this.host = host;
-    this.date = date;
-    this.unzipBytes = unzipBytes;
-    this.html = html;
-    this.charset = charset;
-    this.title = title;
-    this.content = content;
-  }
+  private List<Entry<String, String>> anchors;
 }

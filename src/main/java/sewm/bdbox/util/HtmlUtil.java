@@ -136,10 +136,7 @@ public class HtmlUtil {
   public static List<Entry<String, String>> parseAnchors(String data,
       String host, String url) {
     List<Entry<String, String>> anchors = new ArrayList<Entry<String, String>>();
-    host = host.replaceAll("(?is)^https?://", "");
-    url = url.replaceAll("(?is)^https?://", "");
     Matcher matcher = A_PATTERN.matcher(data);
-
     while (matcher.find()) {
       String atext = matcher.group("atext");
       atext = parseContent(atext);
@@ -147,30 +144,33 @@ public class HtmlUtil {
       if (atext.isEmpty()) {
         continue;
       }
-      Matcher matcher2 = HREF_PATTERN.matcher(matcher.group("attr"));
-      if (matcher2.find()) {
-        String urlString = matcher2.group("url");
-        urlString = extract(urlString, host, url);
-        if (urlString == null || urlString.isEmpty())
+      Matcher hrefMatcher = HREF_PATTERN.matcher(matcher.group("attr"));
+      if (hrefMatcher.find()) {
+        String href = hrefMatcher.group("url");
+        href = href.substring(1, href.length() - 1);
+        href = verifyUrl(href, host, url);
+        if (href == null || href.isEmpty()) {
           continue;
-        anchors.add(new SimpleEntry<String, String>(urlString, atext));
+        }
+        anchors.add(new SimpleEntry<String, String>(href, atext));
       }
     }
     return anchors;
   }
 
-  private static String extract(String data, String host, String url) {
-    data = data.substring(1, data.length() - 1);
-
-    if (data.startsWith("javascript")) {
+  private static String verifyUrl(String href, String host, String url) {
+    if (href.startsWith("javascript:")) {
       return null;
-    } else if (data.startsWith("/")) {
-      data = host.concat(data);
-    } else if (!url.endsWith("/")) {
-      data = url.concat(data);
+    } else if (href.startsWith("/")) {
+      href = host.concat(href);
+    } else {
+      if (url.endsWith("/")) {
+        href = url.concat(href);
+      } else {
+        href = url + "/" + href;
+      }
     }
-    data = normalize(data);
-    return data;
+    return href;
   }
 
   private static String simplifyUrlPath(String data) {
@@ -192,7 +192,7 @@ public class HtmlUtil {
     return String.join("/", stack);
   }
 
-  static String normalize(String data) {
+  public static String normalize(String data) {
     data = data.replaceAll("(?is)^.*https?://", "");
     data = simplifyUrlPath(data);
     data = data.replaceAll("(?is)^www.", "");

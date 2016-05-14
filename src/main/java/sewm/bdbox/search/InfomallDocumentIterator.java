@@ -117,15 +117,24 @@ public class InfomallDocumentIterator {
       String title = HtmlUtil.parseTitle(html);
       String content = HtmlUtil.parseContent(html);
       String host = HtmlUtil.parseHost(url);
+      List<Entry<String, String>> anchors = HtmlUtil.parseAnchors(html, host,
+          url);
 
-      List<Entry<String, String>> ans = HtmlUtil.parseAnchors(html, host, url);
-
-      InfomallDocument doc = new InfomallDocument(filename, position, version,
-          url, host, date, unzipBytes, html, charset, title, content);
-      // Sets optional data.
+      InfomallDocument doc = new InfomallDocument();
+      doc.setFilename(filename);
+      doc.setPosition(position);
+      doc.setVersion(version);
+      doc.setUrl(url);
+      doc.setHost(host);
+      doc.setDate(date);
+      doc.setUnzipBytes(unzipBytes);
+      doc.setHtml(html);
+      doc.setCharset(charset);
+      doc.setTitle(title);
+      doc.setContent(content);
       doc.setIp(ip);
       doc.setOrigin(origin);
-      doc.setAnchor(ans); // set anchor
+      doc.setAnchors(anchors);
       return doc;
     } catch (IOException e) {
       LogUtil.error(logger, e);
@@ -164,9 +173,9 @@ public class InfomallDocumentIterator {
       // int i = 0;
       while ((doc = iter.next()) != null) {
         // logger.info(++i + ":" + doc.getPosition() + ": " + doc.getUrl());
-        List<Entry<String, String>> ans = doc.getAnchor();
-        for (int f = 0; f < ans.size(); ++f) {
-          logger.info(ans.get(f));
+        List<Entry<String, String>> anchors = doc.getAnchors();
+        for (Entry<String, String> anchor : anchors) {
+          logger.info(anchor);
         }
       }
     } catch (IOException e) {
