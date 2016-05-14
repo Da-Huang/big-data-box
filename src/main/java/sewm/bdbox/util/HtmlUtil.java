@@ -85,6 +85,8 @@ public class HtmlUtil {
     return sb.toString();
   }
 
+  private static Pattern SCRIPT_PATTERN = Pattern.compile(
+      "<script.*?>.*?</script>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
   private static Pattern IMG_PATTERN = Pattern.compile(
       "<img\\s.*?(alt=(?<text>'.*?'|\".*?\"))?.*?>",
       Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
@@ -92,7 +94,7 @@ public class HtmlUtil {
   public static String parseContent(String data) {
     data = data.replaceAll("(?is)^.*?<html", "<html");
     data = data.replaceAll("(?is)<head.*?>.*?</head>", " ");
-    data = data.replaceAll("(?is)<script.*?>.*?</script>", " ");
+    data = SCRIPT_PATTERN.matcher(data).replaceAll(" ");
     data = data.replaceAll("(?is)<style.*?>.*?</style>", " ");
 
     Matcher imgMatcher = IMG_PATTERN.matcher(data);
@@ -135,6 +137,9 @@ public class HtmlUtil {
 
   public static List<Entry<String, String>> parseAnchors(String data,
       String host, String url) {
+    // Removed script first.
+    data = SCRIPT_PATTERN.matcher(data).replaceAll(" ");
+
     List<Entry<String, String>> anchors = new ArrayList<Entry<String, String>>();
     Matcher matcher = A_PATTERN.matcher(data);
     while (matcher.find()) {
@@ -159,8 +164,10 @@ public class HtmlUtil {
   }
 
   private static String verifyUrl(String href, String host, String url) {
-    if (href.startsWith("javascript:")) {
+    if (href.startsWith("javascript:") || href.startsWith("#")) {
       return null;
+    } else if (href.startsWith("?")) {
+      return url.concat(href);
     } else if (href.startsWith("https://") || href.startsWith("http://")) {
       return href;
     } else if (href.startsWith("/")) {
@@ -218,6 +225,8 @@ public class HtmlUtil {
       // .getOptionValue("file"))));
       String data = "202.102.148.186/?oldNews/2001/12x/2420.htm/../../..//yiliao-b,a&o-%j#i'a\"n/baojian.htm";
       System.out.println(HtmlUtil.normalizeURL(data));
+      System.out.println(verifyUrl("?fdsfs", "a.com", "a.com/ewrwe"));
+      System.out.println(verifyUrl("#fdsfs", "a.com", "a.com/ewrwe/"));
     } catch (Exception e) {
       LogUtil.error(logger, e);
     }

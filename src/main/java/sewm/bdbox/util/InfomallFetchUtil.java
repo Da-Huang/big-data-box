@@ -48,15 +48,26 @@ public class InfomallFetchUtil {
       return null;
     }
     Path path = Paths.get(dataMap.get(dir)).resolve(dir).resolve(filename);
+    return fetch(path, position);
+  }
+
+  public static InfomallDocument fetch(Path path, long position) {
     try (SeekableInputStream is = new SeekableFileInputStream(
         new File(path.toUri()))) {
       is.seek(position);
       InfomallDocumentIterator iter = new InfomallDocumentIterator(is,
-          filename);
+          path.getFileName().toString());
       return iter.next();
     } catch (IOException e) {
       LogUtil.error(logger, e);
       return null;
     }
+  }
+
+  public static void main(String[] args) {
+    InfomallDocument doc = fetch(
+        Paths.get("/media/d/infomall/data0/U200201/Web_Raw.U200201.0009"),
+        60641);
+    System.out.println(doc.getHtml());
   }
 }

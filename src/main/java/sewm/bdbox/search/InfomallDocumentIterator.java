@@ -170,9 +170,9 @@ public class InfomallDocumentIterator {
       InfomallDocumentIterator iter = new InfomallDocumentIterator(is,
           data.getFileName().toString());
       InfomallDocument doc;
-      // int i = 0;
+      int i = 0;
       while ((doc = iter.next()) != null) {
-        // logger.info(++i + ":" + doc.getPosition() + ": " + doc.getUrl());
+        logger.info(++i + ":" + doc.getPosition() + ": " + doc.getUrl());
         List<Entry<String, String>> anchors = doc.getAnchors();
         for (Entry<String, String> anchor : anchors) {
           logger.info(anchor);
