@@ -89,8 +89,8 @@ public class HtmlUtil {
   }
 
   private static Pattern IMG_PATTERN = Pattern.compile(
-      "<img\\s.*?(alt=(?<text>'.*?'|\".*?\"))?.*?>", Pattern.DOTALL
-          | Pattern.CASE_INSENSITIVE);
+      "<img\\s.*?(alt=(?<text>'.*?'|\".*?\"))?.*?>",
+      Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 
   public static String parseContent(String data) {
     data = data.replaceAll("(?is)^.*?<html", "<html");
@@ -131,8 +131,8 @@ public class HtmlUtil {
   }
 
   private static Pattern A_PATTERN = Pattern.compile(
-      "<a(?<attr>.*?)>(?<aparse>.*?)</a>", Pattern.DOTALL
-          | Pattern.CASE_INSENSITIVE);
+      "<a(?<attr>.*?)>(?<aparse>.*?)</a>",
+      Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
   private static Pattern HREF_PATTERN = Pattern.compile(
       "href=(?<url>'.*?'|\".*?\")", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 
@@ -193,9 +193,8 @@ public class HtmlUtil {
     reString.trim();
     return reString;
   }
-  
-  public static String normalize(String data)
-  {
+
+  public static String normalize(String data) {
     data = data.replaceAll("(?is)^https?://", "");
     data = simplify(data);
     data = data.replaceAll("(?is)^www.", "");
@@ -206,8 +205,8 @@ public class HtmlUtil {
 
   public static void main(String[] args) {
     Options options = new Options();
-    options.addOption(Option.builder().longOpt("help")
-        .desc("Print help message.").build());
+    options.addOption(
+        Option.builder().longOpt("help").desc("Print help message.").build());
     options.addOption(Option.builder().longOpt("file").argName("file").hasArg()
         .desc("Data path.").build());
     CommandLine line = CommandlineUtil.parse(options, args);

@@ -36,9 +36,8 @@ public class ContentServlet extends HttpServlet {
     try {
       int id = Integer.parseInt(idStr);
       Document doc = WebSingleton.getInfomallSearcher().doc(id);
-      InfomallDocument infomallDoc = InfomallFetchUtil.fetch(
-          DATA_ROOT_PATH, doc.get("filename"),
-          Long.parseLong(doc.get("position")));
+      InfomallDocument infomallDoc = InfomallFetchUtil.fetch(DATA_ROOT_PATH,
+          doc.get("filename"), Long.parseLong(doc.get("position")));
       resp.getOutputStream().write(infomallDoc.getUnzipBytes());
     } catch (NumberFormatException e) {
       resp.sendError(HttpServletResponse.SC_BAD_REQUEST,

@@ -149,8 +149,8 @@ public class InfomallDocumentIterator {
 
   public static void main(String[] args) {
     Options options = new Options();
-    options.addOption(Option.builder().longOpt("help")
-        .desc("Print help message.").build());
+    options.addOption(
+        Option.builder().longOpt("help").desc("Print help message.").build());
     options.addOption(Option.builder().longOpt("data").argName("file").hasArg()
         .desc("Data path.").build());
     CommandLine line = CommandlineUtil.parse(options, args);
@@ -158,10 +158,10 @@ public class InfomallDocumentIterator {
     LogUtil.check(logger, line.hasOption("data"), "Missing --data.");
 
     Path data = Paths.get(line.getOptionValue("data"));
-    try (SeekableInputStream is = new SeekableFileInputStream(new File(
-        data.toUri()))) {
-      InfomallDocumentIterator iter = new InfomallDocumentIterator(is, data
-          .getFileName().toString());
+    try (SeekableInputStream is = new SeekableFileInputStream(
+        new File(data.toUri()))) {
+      InfomallDocumentIterator iter = new InfomallDocumentIterator(is,
+          data.getFileName().toString());
       InfomallDocument doc;
       int i = 0;
       while ((doc = iter.next()) != null) {

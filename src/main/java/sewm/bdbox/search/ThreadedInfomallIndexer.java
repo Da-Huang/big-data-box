@@ -77,8 +77,8 @@ public class ThreadedInfomallIndexer extends InfomallIndexer {
 
   public static void main(String[] args) {
     Options options = new Options();
-    options.addOption(Option.builder().longOpt("help")
-        .desc("Print help message.").build());
+    options.addOption(
+        Option.builder().longOpt("help").desc("Print help message.").build());
     options.addOption(Option.builder().longOpt("data").argName("path").hasArg()
         .desc("Data path.").build());
     options.addOption(Option.builder().longOpt("index").argName("dir").hasArg()
@@ -102,24 +102,23 @@ public class ThreadedInfomallIndexer extends InfomallIndexer {
             + " already exists. Are you sure to build index on it? [y/n]");
       }
       if (line.hasOption("create")) {
-        CommandlineUtil
-            .confirm("create mode will overwrite the old index. Are you sure? [y/n]");
+        CommandlineUtil.confirm(
+            "create mode will overwrite the old index. Are you sure? [y/n]");
       }
     }
 
-    String ignoredCollectionsFile =
-        line.getOptionValue("ignored_collections", "ignored_collections.txt");
+    String ignoredCollectionsFile = line.getOptionValue("ignored_collections",
+        "ignored_collections.txt");
     int threads = Integer.parseInt(line.getOptionValue("threads", "1"));
-    InfomallIndexer.Builder builder =
-        ThreadedInfomallIndexer.builder().threads(threads)
-            .indexPath(line.getOptionValue("index"))
-            .ignoreCollections(ignoredCollectionsFile)
-            .create(line.hasOption("create"));
+    InfomallIndexer.Builder builder = ThreadedInfomallIndexer.builder()
+        .threads(threads).indexPath(line.getOptionValue("index"))
+        .ignoreCollections(ignoredCollectionsFile)
+        .create(line.hasOption("create"));
 
     try (InfomallIndexer indexer = builder.build()) {
       indexer.index(line.getOptionValue("data"));
       indexer.onCloseWriteIgnoredCollections(ignoredCollectionsFile);
-      Signal.handle(new Signal("INT"), new SignalHandler () {
+      Signal.handle(new Signal("INT"), new SignalHandler() {
         public void handle(Signal sig) {
           indexer.stop();
         }
