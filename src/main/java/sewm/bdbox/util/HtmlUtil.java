@@ -152,7 +152,7 @@ public class HtmlUtil {
         if (href == null || href.isEmpty()) {
           continue;
         }
-        anchors.add(new SimpleEntry<String, String>(href, atext));
+        anchors.add(new SimpleEntry<String, String>(atext, href));
       }
     }
     return anchors;
@@ -161,16 +161,17 @@ public class HtmlUtil {
   private static String verifyUrl(String href, String host, String url) {
     if (href.startsWith("javascript:")) {
       return null;
+    } else if (href.startsWith("https://") || href.startsWith("http://")) {
+      return href;
     } else if (href.startsWith("/")) {
-      href = host.concat(href);
+      return host.concat(href);
     } else {
       if (url.endsWith("/")) {
-        href = url.concat(href);
+        return url.concat(href);
       } else {
-        href = url + "/" + href;
+        return url + "/" + href;
       }
     }
-    return href;
   }
 
   private static String simplifyUrlPath(String data) {
@@ -192,7 +193,7 @@ public class HtmlUtil {
     return String.join("/", stack);
   }
 
-  public static String normalize(String data) {
+  public static String normalizeURL(String data) {
     data = data.replaceAll("(?is)^.*https?://", "");
     data = simplifyUrlPath(data);
     data = data.replaceAll("(?is)^www.", "");
@@ -216,7 +217,7 @@ public class HtmlUtil {
       // String data = new String(Files.readAllBytes(Paths.get(line
       // .getOptionValue("file"))));
       String data = "202.102.148.186/?oldNews/2001/12x/2420.htm/../../..//yiliao-b,a&o-%j#i'a\"n/baojian.htm";
-      System.out.println(HtmlUtil.normalize(data));
+      System.out.println(HtmlUtil.normalizeURL(data));
     } catch (Exception e) {
       LogUtil.error(logger, e);
     }

@@ -35,6 +35,7 @@ import org.tukaani.xz.SeekableFileInputStream;
 import org.tukaani.xz.SeekableInputStream;
 
 import sewm.bdbox.util.CommandlineUtil;
+import sewm.bdbox.util.HtmlUtil;
 import sewm.bdbox.util.LogUtil;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
@@ -136,7 +137,9 @@ public class InfomallIndexer implements AutoCloseable {
       Document doc = new Document();
       doc.add(new StoredField("filename", infomallDoc.getFilename()));
       doc.add(new StoredField("position", infomallDoc.getPosition()));
-      doc.add(new StringField("url", infomallDoc.getUrl(), Field.Store.NO));
+
+      doc.add(new StringField("url",
+          HtmlUtil.normalizeURL(infomallDoc.getUrl()), Field.Store.NO));
       doc.add(new StringField("host", infomallDoc.getHost(), Field.Store.NO));
       doc.add(new LongPoint("date", infomallDoc.getDate().getTime()));
       doc.add(new TextField("title", infomallDoc.getTitle(), Field.Store.NO));

@@ -176,6 +176,7 @@ public class InfomallDocumentIterator {
         List<Entry<String, String>> anchors = doc.getAnchors();
         for (Entry<String, String> anchor : anchors) {
           logger.info(anchor);
+          logger.info(HtmlUtil.normalizeURL(anchor.getValue()));
         }
       }
     } catch (IOException e) {
