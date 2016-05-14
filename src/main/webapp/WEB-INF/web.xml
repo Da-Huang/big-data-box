@@ -8,6 +8,10 @@
     <servlet-class>sewm.bdbox.web.ContentServlet</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>GraphServlet</servlet-name>
+    <servlet-class>sewm.bdbox.web.GraphServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>SearchServlet</servlet-name>
     <servlet-class>sewm.bdbox.web.SearchServlet</servlet-class>
   </servlet>

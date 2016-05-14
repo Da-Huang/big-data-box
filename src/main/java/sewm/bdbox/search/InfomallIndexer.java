@@ -147,7 +147,8 @@ public class InfomallIndexer implements AutoCloseable {
           new TextField("content", infomallDoc.getContent(), Field.Store.NO));
       if (infomallDoc.getOrigin() != null) {
         doc.add(
-            new StringField("origin", infomallDoc.getOrigin(), Field.Store.NO));
+            new StringField("origin",
+                HtmlUtil.normalizeURL(infomallDoc.getOrigin()), Field.Store.NO));
       }
       if (infomallDoc.getAnchors() != null) {
         for (Entry<String, String> anchor : infomallDoc.getAnchors()) {
