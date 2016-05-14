@@ -20,6 +20,10 @@
     <url-pattern>/content/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
+    <servlet-name>GraphServlet</servlet-name>
+    <url-pattern>/graph/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
     <servlet-name>SearchServlet</servlet-name>
     <url-pattern>/search/*</url-pattern>
   </servlet-mapping>
