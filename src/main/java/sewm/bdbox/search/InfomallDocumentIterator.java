@@ -8,6 +8,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map.Entry;
 
 import org.apache.commons.cli.CommandLine;
@@ -153,9 +154,9 @@ public class InfomallDocumentIterator {
     }
   }
 
-  private static Date parseDate(String dateStr) {
-    String pattern = "EEE, dd MMM yyyy HH:mm:ss z";
-    DateFormat sdf = new SimpleDateFormat(pattern);
+  public static Date parseDate(String dateStr) {
+    final String pattern = "EEE, dd MMM yyyy HH:mm:ss Z";
+    DateFormat sdf = new SimpleDateFormat(pattern, Locale.ENGLISH);
     try {
       Date date = sdf.parse(dateStr);
       return date;
