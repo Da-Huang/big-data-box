@@ -276,6 +276,8 @@ public class InfomallIndexer implements AutoCloseable {
         .desc("Data path.").build());
     options.addOption(Option.builder().longOpt("index").argName("dir").hasArg()
         .desc("Index path.").build());
+    options.addOption(Option.builder().longOpt("buffer_mb").argName("int")
+        .hasArg().desc("Buffer size in MB used to build index.").build());
     options.addOption(Option.builder().longOpt("ignored_collections")
         .argName("path").hasArg().desc("Ignored collections path.").build());
     options.addOption(Option.builder().longOpt("create")
@@ -304,6 +306,10 @@ public class InfomallIndexer implements AutoCloseable {
         .indexPath(line.getOptionValue("index"))
         .ignoreCollections(ignoredCollectionsFile)
         .create(line.hasOption("create"));
+
+    if (line.hasOption("buffer_mb")) {
+      builder.bufferSizeMB(Integer.parseInt(line.getOptionValue("buffer_mb")));
+    }
 
     try (InfomallIndexer indexer = builder.build()) {
       indexer.index(line.getOptionValue("data"));
