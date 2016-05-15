@@ -7,9 +7,6 @@ import java.util.Map.Entry;
 
 import javax.json.Json;
 import javax.json.stream.JsonGenerator;
-import javax.print.Doc;
-import javax.swing.text.StyledEditorKit.ForegroundAction;
-import javax.swing.text.html.HTML;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
@@ -20,10 +17,10 @@ import org.apache.lucene.search.TopDocs;
 import sewm.bdbox.search.InfomallDocument;
 import sewm.bdbox.search.InfomallSearcher;
 
-// TODO: Take Origin into concern.
+// TODO: Take Origin and Referer into concern.
 public class InfomallGraphUtil {
   /**
-   * Returns <Normalized URL, URL>.
+   * @return Map of <Normalized URL, URL>.
    */
   public static Map<String, String> fetchInUrls(
       final Map<String, String> dataMap, InfomallSearcher searcher,
@@ -49,7 +46,7 @@ public class InfomallGraphUtil {
   }
 
   /**
-   * Returns <Normalized URL, URL>.
+   * @return Map of <Normalized URL, URL>.
    */
   public static Map<String, String> fetchOutUrls(
       final Map<String, String> dataMap, InfomallSearcher searcher,

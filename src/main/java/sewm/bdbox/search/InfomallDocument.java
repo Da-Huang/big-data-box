@@ -24,6 +24,7 @@ public class InfomallDocument {
   // Optional.
   private String ip;
   private String origin;
+  private String referer;
   // Key: Anchor Text, Value: Raw URL.
   private List<Entry<String, String>> anchors;
 }

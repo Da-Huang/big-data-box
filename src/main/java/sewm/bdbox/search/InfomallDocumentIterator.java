@@ -51,6 +51,7 @@ public class InfomallDocumentIterator {
 
       String ip = null;
       String origin = null;
+      String referer = null;
 
       String line;
       while ((line = StreamUtil.readLine(is)) != null && !line.isEmpty()) {
@@ -74,6 +75,10 @@ public class InfomallDocumentIterator {
           ip = item[1];
         } else if (item[0].equals("origin")) {
           origin = item[1];
+        } else if (item[0].equals("referer")) {
+          referer = item[1];
+        } else if (item[0].equals("anchortext")) {
+          // Skip.
         } else {
           logger.warn("Type wrong\n");
         }
@@ -102,6 +107,11 @@ public class InfomallDocumentIterator {
         logger.warn("Length not Found\n");
         return null;
       }
+      String host = HtmlUtil.parseHost(url);
+      if (host == null) {
+        return null;
+      }
+
       byte[] bytes = new byte[length];
       int byteCount = is.read(bytes);
       if (byteCount < bytes.length) {
@@ -114,11 +124,11 @@ public class InfomallDocumentIterator {
       String charset = HtmlUtil.pCharset(detector, unzipBytes);
       String html = new String(unzipBytes, charset);
 
-      String title = HtmlUtil.parseTitle(html);
-      String content = HtmlUtil.parseContent(html);
-      String host = HtmlUtil.parseHost(url);
-      List<Entry<String, String>> anchors = HtmlUtil.parseAnchors(html, host,
-          url);
+      String title = HtmlUtil.extractTitle(html);
+      String cleanHtml = HtmlUtil.extractCleanHtml(html);
+      String content = HtmlUtil.extractContentFromCleanHtml(cleanHtml);
+      List<Entry<String, String>> anchors = HtmlUtil
+          .extractAnchorsFromCleanHtml(cleanHtml, host, url);
 
       InfomallDocument doc = new InfomallDocument();
       doc.setFilename(filename);
@@ -134,6 +144,7 @@ public class InfomallDocumentIterator {
       doc.setContent(content);
       doc.setIp(ip);
       doc.setOrigin(origin);
+      doc.setReferer(referer);
       doc.setAnchors(anchors);
       return doc;
     } catch (IOException e) {

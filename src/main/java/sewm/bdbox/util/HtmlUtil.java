@@ -71,10 +71,12 @@ public class HtmlUtil {
     return null;
   }
 
-  public static String parseTitle(String data) {
-    Pattern pattern = Pattern.compile("<title\\s*>(?<title>.*?)</title>",
-        Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
-    Matcher matcher = pattern.matcher(data);
+  private static final Pattern TITLE_PATTERN = Pattern.compile(
+      "<title\\s*>(?<title>.*?)</title>",
+      Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+
+  public static String extractTitle(String html) {
+    Matcher matcher = TITLE_PATTERN.matcher(html);
     StringBuilder sb = new StringBuilder();
     while (matcher.find()) {
       if (sb.length() > 0 && sb.charAt(sb.length() - 1) != ' ') {
@@ -85,20 +87,33 @@ public class HtmlUtil {
     return sb.toString();
   }
 
-  private static Pattern SCRIPT_PATTERN = Pattern.compile(
-      "<script.*?>.*?</script>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+  /**
+   * @param cleanHtml
+   *          is returned from extractCleanHtml.
+   */
+  public static String extractContentFromCleanHtml(String cleanHtml) {
+    cleanHtml = cleanHtml.replaceAll("(?s)<\\w+?.*?>", " ");
+    cleanHtml = cleanHtml.replaceAll("</\\w+?>", " ");
+    cleanHtml = cleanHtml.replaceAll("\\s+", " ");
+    return cleanHtml;
+  }
+
   private static Pattern IMG_PATTERN = Pattern.compile(
       "<img\\s.*?(alt=(?<text>'.*?'|\".*?\"))?.*?>",
       Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 
-  public static String parseContent(String data) {
-    data = data.replaceAll("\\s+>", ">");
-    data = data.replaceAll("(?is)^.*?<html", "<html");
-    data = data.replaceAll("(?is)<head.*?>.*?</head>", " ");
-    data = SCRIPT_PATTERN.matcher(data).replaceAll(" ");
-    data = data.replaceAll("(?is)<style.*?>.*?</style>", " ");
+  public static String extractCleanHtml(String html) {
+    html = html.replaceAll("\\s+>", ">");
+    html = html.replaceAll("(?is)^.*?<html", "<html");
+    html = html.replaceAll("(?is)<head.*?>.*?</head>", " ");
+    html = html.replaceAll("(?is)<script.*?>.*?</script>", " ");
+    html = html.replaceAll("(?is)<style.*?>.*?</style>", " ");
+    html = html.replaceAll("(?s)<!.*?>", " ");
+    // Removes begin tags except for <a> and <img>.
+    html = html.replaceAll("(?s)<[b-hj-z].*?>", " ");
 
-    Matcher imgMatcher = IMG_PATTERN.matcher(data);
+    // Extracts img alt.
+    Matcher imgMatcher = IMG_PATTERN.matcher(html);
     StringBuffer sb = new StringBuffer();
     while (imgMatcher.find()) {
       String replacement = imgMatcher.group("text");
@@ -109,15 +124,19 @@ public class HtmlUtil {
       }
     }
     imgMatcher.appendTail(sb);
-    data = sb.toString();
+    html = sb.toString();
 
-    data = data.replaceAll("(?s)<\\w+?.*?>", " ");
-    data = data.replaceAll("</\\w+?>", " ");
-    data = data.replaceAll("(?s)<!.*?>", " ");
-    data = data.replaceAll("\\s+", " ");
-    return data;
+    // Removes end tags except for </a>.
+    html = html.replaceAll("(?s)</[b-z]\\w*?>", " ");
+    // Removes tags with at least 2 characters.
+    html = html.replaceAll("(?s)<\\w\\w.*?>", " ");
+    html = html.replaceAll("(?s)</\\w\\w+?>", " ");
+    return html;
   }
 
+  /**
+   * @return null, if invalid.
+   */
   public static String parseHost(String url) {
     URL aUrl;
     try {
@@ -131,22 +150,22 @@ public class HtmlUtil {
   }
 
   private static Pattern A_PATTERN = Pattern.compile(
-      "<a(?<attr>.*?)>(?<atext>.*?)</a>",
+      "<a (?<attr>.*?)>(?<atext>.*?)</a>",
       Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
   private static Pattern HREF_PATTERN = Pattern.compile(
       "href=(?<url>'.*?'|\".*?\")", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 
-  public static List<Entry<String, String>> parseAnchors(String data,
-      String host, String url) {
-    // Removed script first.
-    data = data.replaceAll("\\s+>", ">");
-    data = SCRIPT_PATTERN.matcher(data).replaceAll(" ");
-
+  /**
+   * @param cleanHtml
+   *          is returned from extractCleanHtml.
+   */
+  public static List<Entry<String, String>> extractAnchorsFromCleanHtml(
+      String cleanHtml, String host, String url) {
     List<Entry<String, String>> anchors = new ArrayList<Entry<String, String>>();
-    Matcher matcher = A_PATTERN.matcher(data);
+    Matcher matcher = A_PATTERN.matcher(cleanHtml);
     while (matcher.find()) {
       String atext = matcher.group("atext");
-      atext = parseContent(atext);
+      atext = extractContentFromCleanHtml(atext);
       atext = atext.trim();
       if (atext.isEmpty()) {
         continue;
@@ -226,10 +245,14 @@ public class HtmlUtil {
     try {
       // String data = new String(Files.readAllBytes(Paths.get(line
       // .getOptionValue("file"))));
-      String data = "202.102.148.186/?oldNews/2001/12x/2420.htm/../../..//yiliao-b,a&o-%j#i'a\"n/baojian.htm";
-      System.out.println(HtmlUtil.normalizeURL(data));
-      System.out.println(verifyUrl("?fdsfs", "a.com", "a.com/ewrwe"));
-      System.out.println(verifyUrl("#fdsfs", "a.com", "a.com/ewrwe/"));
+      // String data =
+      // "202.102.148.186/?oldNews/2001/12x/2420.htm/../../..//yiliao-b,a&o-%j#i'a\"n/baojian.htm";
+      // System.out.println(HtmlUtil.normalizeURL(data));
+      // System.out.println(verifyUrl("?fdsfs", "a.com", "a.com/ewrwe"));
+      // System.out.println(verifyUrl("#fdsfs", "a.com", "a.com/ewrwe/"));
+      String html = "<A href=''>xxx</A>";
+      html = HtmlUtil.extractCleanHtml(html);
+      System.out.println(html);
     } catch (Exception e) {
       LogUtil.error(logger, e);
     }
