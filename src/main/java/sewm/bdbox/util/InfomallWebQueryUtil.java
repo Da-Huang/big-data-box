@@ -1,6 +1,7 @@
 package sewm.bdbox.util;
 
 import org.apache.logging.log4j.Logger;
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
 import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.index.Term;
@@ -16,30 +17,33 @@ public class InfomallWebQueryUtil {
   private static final Logger logger = LogUtil
       .getLogger(InfomallWebQueryUtil.class);
 
+  private static final Analyzer ANALYZER = new SmartChineseAnalyzer(true);
+  private static final QueryParser TITLE_QUERY_PARSER = new QueryParser("title",
+      ANALYZER);
+
   public static Query parseTitleQuery(String title, float boost) {
     if (title == null) {
       return null;
     }
-    QueryParser parser = new QueryParser("title",
-        new SmartChineseAnalyzer(true));
     try {
-      return new BoostQuery(parser.parse(title), boost);
+      return new BoostQuery(TITLE_QUERY_PARSER.parse(title), boost);
     } catch (ParseException e) {
-      logger.error(e.getMessage());
+      logger.error(e);
       return null;
     }
   }
+
+  private static final QueryParser CONTENT_QUERY_PARSER = new QueryParser(
+      "content", ANALYZER);
 
   public static Query parseContentQuery(String content) {
     if (content == null) {
       return null;
     }
-    QueryParser parser = new QueryParser("content",
-        new SmartChineseAnalyzer(true));
     try {
-      return parser.parse(content);
+      return CONTENT_QUERY_PARSER.parse(content);
     } catch (ParseException e) {
-      logger.error(e.getMessage());
+      logger.error(e);
       return null;
     }
   }
@@ -93,14 +97,14 @@ public class InfomallWebQueryUtil {
       try {
         start = Long.parseLong(startDate);
       } catch (NumberFormatException e) {
-        logger.error(e.getMessage());
+        logger.error(e);
       }
     }
     if (endDate != null) {
       try {
         end = Long.parseLong(endDate);
       } catch (NumberFormatException e) {
-        logger.error(e.getMessage());
+        logger.error(e);
       }
     }
     return start == Long.MIN_VALUE && end == Long.MAX_VALUE ? null
@@ -108,7 +112,8 @@ public class InfomallWebQueryUtil {
   }
 
   public static Query parseUrlQuery(String url) {
-    return url == null ? null : new TermQuery(new Term("url", url));
+    return url == null ? null
+        : new TermQuery(new Term("url", HtmlUtil.normalizeURL(url)));
   }
 
   public static Query parseHostQuery(String host) {
@@ -122,7 +127,7 @@ public class InfomallWebQueryUtil {
     try {
       return Float.parseFloat(titleBoost);
     } catch (NumberFormatException e) {
-      logger.error(e.getMessage());
+      logger.error(e);
       return 10f;
     }
   }
@@ -134,6 +139,7 @@ public class InfomallWebQueryUtil {
     try {
       return Integer.parseInt(start);
     } catch (NumberFormatException e) {
+      logger.error(e);
       return 0;
     }
   }
@@ -145,6 +151,7 @@ public class InfomallWebQueryUtil {
     try {
       return Integer.parseInt(limit);
     } catch (NumberFormatException e) {
+      logger.error(e);
       return 20;
     }
   }
