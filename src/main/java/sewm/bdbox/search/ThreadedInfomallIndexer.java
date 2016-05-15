@@ -26,6 +26,8 @@ public class ThreadedInfomallIndexer extends InfomallIndexer {
 
   private ThreadedInfomallIndexer(Builder builder) throws IOException {
     super(builder);
+    logger
+        .info("Using " + builder.threads + " threads at most to build index.");
     executor = Executors.newFixedThreadPool(builder.threads);
   }
 
