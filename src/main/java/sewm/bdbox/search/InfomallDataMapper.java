@@ -9,6 +9,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.cli.CommandLine;
@@ -23,7 +24,8 @@ public class InfomallDataMapper {
   private static final Logger logger = LogUtil
       .getLogger(InfomallSearcher.class);
 
-  protected static final String INFOMALL_DATA_PREFIX = "U";
+  private static final Pattern INFOMALL_DATA_PATTERN = Pattern
+      .compile("[A-Z]\\d{6}");
 
   public static Map<String, String> map(Path path) {
     Map<String, String> map = new HashMap<>();
@@ -32,7 +34,8 @@ public class InfomallDataMapper {
         @Override
         public FileVisitResult preVisitDirectory(Path dir,
             BasicFileAttributes attrs) throws IOException {
-          if (dir.getFileName().toString().startsWith(INFOMALL_DATA_PREFIX)) {
+          if (INFOMALL_DATA_PATTERN.matcher(dir.getFileName().toString())
+              .matches()) {
             map.put(dir.getFileName().toString(), dir.getParent().toString());
             return FileVisitResult.SKIP_SUBTREE;
           } else {
@@ -52,8 +55,8 @@ public class InfomallDataMapper {
         Option.builder().longOpt("help").desc("Print help message.").build());
     options.addOption(Option.builder().longOpt("data").argName("path").hasArg()
         .desc("Data root path.").build());
-    options.addOption(Option.builder().longOpt("map").argName("path")
-        .hasArg().desc("Data mapping output path.").build());
+    options.addOption(Option.builder().longOpt("map").argName("path").hasArg()
+        .desc("Data mapping output path.").build());
     CommandLine line = CommandlineUtil.parse(options, args);
 
     LogUtil.check(logger, line.hasOption("data"), "Missing --data.");
