@@ -22,6 +22,10 @@ public class GraphServlet extends HttpServlet {
       throws ServletException, IOException {
     String url = req.getParameter("url");
     logger.info("url=" + url);
+    if (url == null) {
+      resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid url.");
+      return;
+    }
 
     Map<String, String> in = InfomallGraphUtil.fetchInUrls(
         ContentServlet.DATA_MAP, WebSingleton.getInfomallSearcher(), url);

@@ -82,12 +82,12 @@ public class InfomallGraphUtil {
     generator.writeStartArray("in");
     for (Entry<String, String> entry : in.entrySet()) {
       generator.writeStartObject().write("url", entry.getValue())
-          .write("normalized_url", entry.getKey());
+          .write("normalized_url", entry.getKey()).writeEnd();
     }
     generator.writeEnd().writeStartArray("out");
     for (Entry<String, String> entry : out.entrySet()) {
       generator.writeStartObject().write("url", entry.getValue())
-          .write("normalized_url", entry.getKey());
+          .write("normalized_url", entry.getKey()).writeEnd();
     }
     generator.writeEnd().writeEnd().close();
   }
