@@ -93,14 +93,15 @@ public class HtmlUtil {
    */
   public static String extractContentFromCleanHtml(String cleanHtml) {
     cleanHtml = cleanHtml.replaceAll("(?s)<\\w+?.*?>", " ");
-    cleanHtml = cleanHtml.replaceAll("</\\w+?>", " ");
+    cleanHtml = cleanHtml.replaceAll("<\\\\?/\\w+?>", " ");
+    cleanHtml = cleanHtml.replaceAll("&nbsp;", " ");
     cleanHtml = cleanHtml.replaceAll("\\s+", " ");
     return cleanHtml;
   }
 
-  private static Pattern IMG_PATTERN = Pattern.compile(
-      "<img\\s.*?(alt=(?<alt>'.*?'|\".*?\"))?.*?>",
-      Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+  // private static Pattern IMG_PATTERN = Pattern.compile(
+  // "<img\\s.*?(alt=(?<alt>'.*?'|\".*?\"|\\S+?))?(\\s.*?)?>",
+  // Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 
   public static String extractCleanHtml(String html) {
     html = html.replaceAll("\\s+>", ">");
@@ -111,28 +112,30 @@ public class HtmlUtil {
     html = html.replaceAll("(?s)<!--.*?-->", " ");
     html = html.replaceAll("(?s)<!.*?>", " ");
     // Removes begin tags except for <a> and <img>.
-    html = html.replaceAll("(?is)<[b-hj-z].*?>", " ");
+    // html = html.replaceAll("(?is)<[b-hj-z].*?>", " ");
+    html = html.replaceAll("(?is)<[b-z].*?>", " ");
 
     // Extracts img alt.
-    Matcher imgMatcher = IMG_PATTERN.matcher(html);
-    StringBuffer sb = new StringBuffer();
-    while (imgMatcher.find()) {
-      String alt = imgMatcher.group("alt");
-      if (alt != null) {
-        alt = " " + alt.substring(1, alt.length() - 1) + " ";
-        alt = alt.replaceAll("\\\\", "\\\\\\\\");
-        alt = alt.replaceAll("\\$", "\\\\\\$");
-        imgMatcher.appendReplacement(sb, alt);
-      }
-    }
-    imgMatcher.appendTail(sb);
-    html = sb.toString();
+    // Matcher imgMatcher = IMG_PATTERN.matcher(html);
+    // StringBuffer sb = new StringBuffer();
+    // while (imgMatcher.find()) {
+    // String alt = imgMatcher.group("alt");
+    // if (alt != null) {
+    // alt = " " + alt.substring(1, alt.length() - 1) + " ";
+    // alt = alt.replaceAll("\\\\", "\\\\\\\\");
+    // alt = alt.replaceAll("\\$", "\\\\\\$");
+    // imgMatcher.appendReplacement(sb, alt);
+    // }
+    // }
+    // imgMatcher.appendTail(sb);
+    // html = sb.toString();
 
     // Removes end tags except for </a>.
     html = html.replaceAll("(?i)</[b-z]\\w*?>", " ");
     // Removes tags with at least 2 characters.
     html = html.replaceAll("(?s)<\\w\\w.*?>", " ");
     html = html.replaceAll("</\\w\\w+?>", " ");
+    html = html.replaceAll("\\s+", " ");
     return html;
   }
 
@@ -151,9 +154,12 @@ public class HtmlUtil {
     }
   }
 
-  private static Pattern A_PATTERN = Pattern.compile(
-      "<a\\s.*?(href=(?<href>'.*?'|\".*?\"))?.*?>(?<text>.*?)</a>",
-      Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+  private static Pattern A_BEGIN_PATTERN = Pattern.compile("<a\\s(?<attr>.*?)>",
+      Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+  private static Pattern A_END_PATTERN = Pattern.compile("<\\\\?/a>",
+      Pattern.CASE_INSENSITIVE);
+  private static Pattern HREF_PATTERN = Pattern.compile("href=(?<href>\\S+)",
+      Pattern.CASE_INSENSITIVE);
 
   /**
    * @param cleanHtml
@@ -162,20 +168,34 @@ public class HtmlUtil {
   public static List<Entry<String, String>> extractAnchorsFromCleanHtml(
       String cleanHtml, String host, String url) {
     List<Entry<String, String>> anchors = new ArrayList<Entry<String, String>>();
-    Matcher matcher = A_PATTERN.matcher(cleanHtml);
-    while (matcher.find()) {
-      String href = matcher.group("href");
-      if (href == null) {
+    Matcher aBeginMatcher = A_BEGIN_PATTERN.matcher(cleanHtml);
+    int begin = 0;
+    while (aBeginMatcher.find(begin)) {
+      begin = aBeginMatcher.end();
+
+      Matcher hrefMatcher = HREF_PATTERN.matcher(aBeginMatcher.group("attr"));
+      String href = null;
+      if (hrefMatcher.find()) {
+        href = hrefMatcher.group("href");
+      } else {
         continue;
       }
-      String text = matcher.group("text");
+
+      Matcher aEndMatcher = A_END_PATTERN.matcher(cleanHtml);
+      if (aEndMatcher.find(begin)) {
+        begin = aEndMatcher.end();
+      } else {
+        break;
+      }
+
+      String text = cleanHtml.substring(aBeginMatcher.end(),
+          aEndMatcher.start());
       text = extractContentFromCleanHtml(text);
       text = text.trim();
       if (text.isEmpty()) {
         continue;
       }
 
-      href = href.substring(1, href.length() - 1);
       href = verifyUrl(href, host, url);
       if (href == null || href.isEmpty()) {
         continue;
@@ -186,6 +206,19 @@ public class HtmlUtil {
   }
 
   private static String verifyUrl(String href, String host, String url) {
+    if (href.startsWith("\\'") || href.startsWith("\\\"")) {
+      href = href.substring(2);
+    }
+    if (href.endsWith("\\'") || href.endsWith("\\\"")) {
+      href = href.substring(0, href.length() - 2);
+    }
+    if (href.startsWith("'") || href.startsWith("\"")) {
+      href = href.substring(1);
+    }
+    if (href.endsWith("'") || href.endsWith("\"")) {
+      href = href.substring(0, href.length() - 1);
+    }
+
     if (href.isEmpty() || href.startsWith("javascript:")
         || href.startsWith("#")) {
       return null;
