@@ -1,6 +1,6 @@
 #/usr/bin/bash
 
-data=/Volumes/HPT8_56T/data/U200201
-index=/Volumes/HPT8_56T/index.old
-java -Xms4g -Xmx4g -cp target/big-data-box.jar:target/lib/* sewm.bdbox.search.InfomallIndexer --data=$data --index=$index
-sendemail -f sewm_pku@yeah.net -t dhuang.cn@gmail.com -s smtp.yeah.net -u "Index for $data has been built!" -m "Please check $index." -xu sewm_pku -xp sewm1220
+data=/mnt/HPT8_56T/infomall-data/data2
+index=/mnt/HPT8_56T/infomall-index/index2
+java -Xms40g -Xmx40g -cp target/big-data-box.jar:target/lib/* sewm.bdbox.search.ThreadedInfomallIndexer --data=$data --index=$index --buffer_mb=30720 --threads=16
+#sendemail -f sewm_pku@yeah.net -t dhuang.cn@gmail.com -s smtp.yeah.net -u "Index for $data has been built!" -m "Please check $index." -xu sewm_pku -xp sewm1220
