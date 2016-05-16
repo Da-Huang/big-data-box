@@ -99,38 +99,40 @@ public class HtmlUtil {
   }
 
   private static Pattern IMG_PATTERN = Pattern.compile(
-      "<img\\s.*?(alt=(?<text>'.*?'|\".*?\"))?.*?>",
+      "<img\\s.*?(alt=(?<alt>'.*?'|\".*?\"))?.*?>",
       Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 
   public static String extractCleanHtml(String html) {
     html = html.replaceAll("\\s+>", ">");
-    html = html.replaceAll("(?is)^.*?<html", "<html");
     html = html.replaceAll("(?is)<head.*?>.*?</head>", " ");
     html = html.replaceAll("(?is)<script.*?>.*?</script>", " ");
     html = html.replaceAll("(?is)<style.*?>.*?</style>", " ");
+    html = html.replaceAll("(?is)^.*?<html", "<html");
+    html = html.replaceAll("(?s)<!--.*?-->", " ");
     html = html.replaceAll("(?s)<!.*?>", " ");
     // Removes begin tags except for <a> and <img>.
-    html = html.replaceAll("(?s)<[b-hj-z].*?>", " ");
+    html = html.replaceAll("(?is)<[b-hj-z].*?>", " ");
 
     // Extracts img alt.
     Matcher imgMatcher = IMG_PATTERN.matcher(html);
     StringBuffer sb = new StringBuffer();
     while (imgMatcher.find()) {
-      String replacement = imgMatcher.group("text");
-      if (replacement != null) {
-        replacement = " " + replacement.substring(1, replacement.length() - 1)
-            + " ";
-        imgMatcher.appendReplacement(sb, replacement);
+      String alt = imgMatcher.group("alt");
+      if (alt != null) {
+        alt = " " + alt.substring(1, alt.length() - 1) + " ";
+        alt = alt.replaceAll("\\\\", "\\\\\\\\");
+        alt = alt.replaceAll("\\$", "\\\\\\$");
+        imgMatcher.appendReplacement(sb, alt);
       }
     }
     imgMatcher.appendTail(sb);
     html = sb.toString();
 
     // Removes end tags except for </a>.
-    html = html.replaceAll("(?s)</[b-z]\\w*?>", " ");
+    html = html.replaceAll("(?i)</[b-z]\\w*?>", " ");
     // Removes tags with at least 2 characters.
     html = html.replaceAll("(?s)<\\w\\w.*?>", " ");
-    html = html.replaceAll("(?s)</\\w\\w+?>", " ");
+    html = html.replaceAll("</\\w\\w+?>", " ");
     return html;
   }
 
@@ -150,10 +152,8 @@ public class HtmlUtil {
   }
 
   private static Pattern A_PATTERN = Pattern.compile(
-      "<a (?<attr>.*?)>(?<atext>.*?)</a>",
+      "<a\\s.*?(href=(?<href>'.*?'|\".*?\"))?.*?>(?<text>.*?)</a>",
       Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
-  private static Pattern HREF_PATTERN = Pattern.compile(
-      "href=(?<url>'.*?'|\".*?\")", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 
   /**
    * @param cleanHtml
@@ -164,29 +164,30 @@ public class HtmlUtil {
     List<Entry<String, String>> anchors = new ArrayList<Entry<String, String>>();
     Matcher matcher = A_PATTERN.matcher(cleanHtml);
     while (matcher.find()) {
-      String atext = matcher.group("atext");
-      atext = extractContentFromCleanHtml(atext);
-      atext = atext.trim();
-      if (atext.isEmpty()) {
+      String href = matcher.group("href");
+      if (href == null) {
+        continue;
+      }
+      String text = matcher.group("text");
+      text = extractContentFromCleanHtml(text);
+      text = text.trim();
+      if (text.isEmpty()) {
         continue;
       }
 
-      Matcher hrefMatcher = HREF_PATTERN.matcher(matcher.group("attr"));
-      if (hrefMatcher.find()) {
-        String href = hrefMatcher.group("url");
-        href = href.substring(1, href.length() - 1);
-        href = verifyUrl(href, host, url);
-        if (href == null || href.isEmpty()) {
-          continue;
-        }
-        anchors.add(new SimpleEntry<String, String>(atext, href));
+      href = href.substring(1, href.length() - 1);
+      href = verifyUrl(href, host, url);
+      if (href == null || href.isEmpty()) {
+        continue;
       }
+      anchors.add(new SimpleEntry<String, String>(text, href));
     }
     return anchors;
   }
 
   private static String verifyUrl(String href, String host, String url) {
-    if (href.startsWith("javascript:") || href.startsWith("#")) {
+    if (href.isEmpty() || href.startsWith("javascript:")
+        || href.startsWith("#")) {
       return null;
     } else if (href.startsWith("?")) {
       return url.concat(href);
@@ -250,9 +251,15 @@ public class HtmlUtil {
       // System.out.println(HtmlUtil.normalizeURL(data));
       // System.out.println(verifyUrl("?fdsfs", "a.com", "a.com/ewrwe"));
       // System.out.println(verifyUrl("#fdsfs", "a.com", "a.com/ewrwe/"));
-      String html = "<A href=''>xxx</A>";
-      html = HtmlUtil.extractCleanHtml(html);
+      // String html = "<A href=''>xxx</A>";
+      // html = "<IMG href=''>xdfs</IMG>";
+      // html = HtmlUtil.extractCleanHtml(html);
+      // System.out.println(html);
+      String html = "C:\\DOCUME~1\\Goes\\LOCALS~1\\Temp\\((A$F[7FV{D223S{Q03%$MQ.jpg";
       System.out.println(html);
+      String regex = "\\\\";
+      System.out.println(regex);
+      System.out.println(html.replaceAll("\\\\", "\\\\\\\\"));
     } catch (Exception e) {
       LogUtil.error(logger, e);
     }
