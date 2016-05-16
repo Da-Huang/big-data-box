@@ -222,7 +222,7 @@ public class HtmlUtil {
     String ans = null;
     if (href.isEmpty() || href.startsWith("javascript:")
         || href.startsWith("#")) {
-      // Skip.
+      return null;
     } else if (href.startsWith("?")) {
       ans = url.concat(href);
     } else if (href.startsWith("https://") || href.startsWith("http://")) {
@@ -239,11 +239,11 @@ public class HtmlUtil {
 
     // Checks the length of ans.
     if (ans.length() > 200) {
-      ans = null;
+      return null;
     }
     // Checks whether it's itself.
     if (normalizeURL(ans) == normalizeURL(url)) {
-      ans = null;
+      return null;
     }
     return ans;
   }
