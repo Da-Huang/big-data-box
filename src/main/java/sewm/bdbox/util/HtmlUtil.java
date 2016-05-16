@@ -105,9 +105,9 @@ public class HtmlUtil {
 
   public static String extractCleanHtml(String html) {
     html = html.replaceAll("\\s+>", ">");
-    html = html.replaceAll("(?is)<head.*?>.*?</head>", " ");
-    html = html.replaceAll("(?is)<script.*?>.*?</script>", " ");
-    html = html.replaceAll("(?is)<style.*?>.*?</style>", " ");
+    html = html.replaceAll("(?is)<head.*?</head>", " ");
+    html = html.replaceAll("(?is)<script.*?</script>", " ");
+    html = html.replaceAll("(?is)<style.*?</style>", " ");
     html = html.replaceAll("(?is)^.*?<html", "<html");
     html = html.replaceAll("(?s)<!--.*?-->", " ");
     html = html.replaceAll("(?s)<!.*?>", " ");
@@ -219,22 +219,33 @@ public class HtmlUtil {
       href = href.substring(0, href.length() - 1);
     }
 
+    String ans = null;
     if (href.isEmpty() || href.startsWith("javascript:")
         || href.startsWith("#")) {
-      return null;
+      // Skip.
     } else if (href.startsWith("?")) {
-      return url.concat(href);
+      ans = url.concat(href);
     } else if (href.startsWith("https://") || href.startsWith("http://")) {
-      return href;
+      ans = href;
     } else if (href.startsWith("/")) {
-      return host.concat(href);
+      ans = host.concat(href);
     } else {
       if (url.endsWith("/")) {
-        return url.concat(href);
+        ans = url.concat(href);
       } else {
-        return url + "/" + href;
+        ans = url + "/" + href;
       }
     }
+
+    // Checks the length of ans.
+    if (ans.length() > 200) {
+      ans = null;
+    }
+    // Checks whether it's itself.
+    if (normalizeURL(ans) == normalizeURL(url)) {
+      ans = null;
+    }
+    return ans;
   }
 
   private static String simplifyUrlPath(String data) {
