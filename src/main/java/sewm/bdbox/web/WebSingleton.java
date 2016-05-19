@@ -38,7 +38,7 @@ class WebSingleton {
         if (infomallSearcher == null) {
           try {
             infomallSearcher = new InfomallSearcher(
-                getProperties().getProperty("index"));
+                getProperties().getProperty("index").split(";"));
           } catch (IOException e) {
             LogUtil.error(logger, e);
           }

@@ -18,6 +18,8 @@ import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.BoostQuery;
 import org.apache.lucene.search.IndexSearcher;
+//import org.apache.lucene.search.MultiSearcher;
+import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
@@ -31,12 +33,17 @@ public class InfomallSearcher implements AutoCloseable {
   private static final Logger logger = LogUtil
       .getLogger(InfomallSearcher.class);
 
-  private IndexReader reader = null;
+  private MultiReader reader = null;
   private IndexSearcher searcher = null;
 
-  public InfomallSearcher(String indexPath) throws IOException {
-    reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexPath)));
-    searcher = new IndexSearcher(reader);
+  public InfomallSearcher(String... indexPaths) throws IOException {
+    IndexReader[] readers=new IndexReader[indexPaths.length];
+		for(int i=0;i<indexPaths.length;i++){
+		  readers[i] = DirectoryReader.open(
+											FSDirectory.open(Paths.get(indexPaths[i])));
+		}
+		reader=new MultiReader(readers);
+		searcher=new IndexSearcher(reader);
   }
 
   public TopDocs search(Query query, int n) {
@@ -77,7 +84,7 @@ public class InfomallSearcher implements AutoCloseable {
     options.addOption(Option.builder().longOpt("limit").argName("int").hasArg()
         .desc("Limited number of displayed documents.").build());
     CommandLine line = CommandlineUtil.parse(options, args);
-
+		
     LogUtil.check(logger, line.hasOption("index"), "Missing --index.");
     LogUtil.check(logger, line.hasOption("data_map"), "Missing --data_map.");
     LogUtil.check(logger, line.hasOption("query"), "Missing --query.");
@@ -86,8 +93,9 @@ public class InfomallSearcher implements AutoCloseable {
     Analyzer analyzer = new SmartChineseAnalyzer(true);
     QueryParser titleParser = new QueryParser("title", analyzer);
     QueryParser contentParser = new QueryParser("content", analyzer);
-    try (InfomallSearcher searcher = new InfomallSearcher(
-        line.getOptionValue("index"))) {
+		 
+		try (InfomallSearcher searcher = new InfomallSearcher(
+					line.getOptionValue("index").split(";"))) {
       Map<String, String> dataMap = InfomallFetchUtil
           .loadDataMap(Paths.get(line.getOptionValue("data_map")));
 
