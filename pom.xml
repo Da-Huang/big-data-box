@@ -118,14 +118,14 @@
             </configuration>
           </execution>
           <execution>
-            <id>install-sigma</id>
+            <id>install-d3</id>
             <phase>process-resources</phase>
             <goals>
               <goal>wget</goal>
             </goals>
             <configuration>
-              <url>https://github.com/jacomyal/sigma.js/releases/download/v1.1.0/release-v1.1.0.zip</url>
-              <outputFileName>sigma.js.zip</outputFileName>
+              <url>https://github.com/d3/d3/releases/download/v3.5.17/d3.zip</url>
+              <outputFileName>d3.js.zip</outputFileName>
               <outputDirectory>${project.build.directory}/zip</outputDirectory>
             </configuration>
           </execution>
@@ -178,14 +178,14 @@
         <version>1.8</version>
         <executions>
           <execution>
-            <id>unzip-sigma.js</id>
+            <id>unzip-d3.js</id>
             <phase>process-resources</phase>
             <goals>
               <goal>run</goal>
             </goals>
             <configuration>
               <target>
-                <unzip src="${project.build.directory}/zip/sigma.js.zip" dest="${project.basedir}/src/main/webapp/static/script/sigma"/>
+                <unzip src="${project.build.directory}/zip/d3.js.zip" dest="${project.basedir}/src/main/webapp/static/script/d3"/>
               </target>
             </configuration>
           </execution>
