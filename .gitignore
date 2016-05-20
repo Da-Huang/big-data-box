@@ -10,5 +10,5 @@ target
 *.log.gz
 *.swp
 
+d3
 jquery.js
-sigma
