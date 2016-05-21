@@ -2,21 +2,72 @@
   display:none;
 }
 
+* {
+  font-family:Arial;
+}
+
+body {
+  margin:0;
+}
+
+.search_form {
+  margin:20px;
+}
+
+.search_form * {
+  font-size:large;
+}
+
+.search_main_field {
+  margin:0 30px;
+}
+
+.search_main_field span {
+  margin-right:15px;
+  font-weight:bold;
+}
+
+.search_main_field input {
+  width:400;
+}
+
 .advanced_search_options {
+  margin:5px;
   display:none;
 }
 
-.results_count {
-  display:none;
+.advanced_search_options input {
+  width:200;
 }
 
-.results {
+.advanced_search_options td.item_name {
+  text-align:right;
+}
+
+.advanced_search_options td.item_name.right>span {
+  margin-left:10px;
+}
+
+.divider {
+  margin:15px 0;
+  height:3px;
+  background-color:black;
+}
+
+.result_list_count {
+  display:none;
+  margin:20px 50px;
+  font-size:large;
+}
+
+.result_list {
   margin-top:60px;
   margin-bottom:60px;
+  margin:20px 50px;
 }
 
 .result {
-  margin:23px 50px;
+  margin:20px 0;
 }
 
 .result_title {
@@ -30,4 +81,6 @@
 
 .paging {
   display:none;
+  margin:30px 50px;
+  font-size:large;
 }

@@ -1,6 +1,7 @@
 package sewm.bdbox.web;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.Logger;
 
 import sewm.bdbox.util.InfomallGraphUtil;
+import sewm.bdbox.util.InfomallWebQueryUtil;
 import sewm.bdbox.util.LogUtil;
 
 public class GraphServlet extends HttpServlet {
@@ -26,11 +28,14 @@ public class GraphServlet extends HttpServlet {
       resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid url.");
       return;
     }
+    int limit = InfomallWebQueryUtil.parseLimit(req.getParameter("limit"));
 
     Map<String, String> in = InfomallGraphUtil.fetchInUrls(
-        ContentServlet.DATA_MAP, WebSingleton.getInfomallSearcher(), url);
+        ContentServlet.DATA_MAP, WebSingleton.getInfomallSearcher(), url,
+        limit);
     Map<String, String> out = InfomallGraphUtil.fetchOutUrls(
-        ContentServlet.DATA_MAP, WebSingleton.getInfomallSearcher(), url);
+        ContentServlet.DATA_MAP, WebSingleton.getInfomallSearcher(), url,
+        limit);
 
     InfomallGraphUtil.writeResultAsJson(resp.getWriter(), url, in, out);
   }

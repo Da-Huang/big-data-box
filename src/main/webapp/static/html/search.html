@@ -3,42 +3,56 @@
 <title>Search in the Box</title>
 <link rel='stylesheet' type='text/css' href='/big-data-box/static/css/search.css'>
 <script src='/big-data-box/static/script/jquery.js'></script>
+<script src='/big-data-box/static/script/jquery-plugin-query-object-master/jquery.query-object.js'></script>
 <script src='/big-data-box/static/script/search.js'></script>
 </head>
 <body>
-<form action='/big-data-box/search' class='search_form' method="get">
-  <div>
-    Text<input name='text' type='text'>
-    <button type='button' onclick='Search(0, RESULTS_EACH_PAGE)'>Search</button>
+<form class='search_form'>
+  <div class='search_main_field'>
+    <span>Text</span><input name='text' type='text'>
+    <button type='button' onclick='ClickSearchButton()'>Search</button>
     <a href='javascript:void(0)' onclick='ToggleOptions()'>More/Less Options</a>
   </div>
   <div class='advanced_search_options'>
-    <div>
-      Title<input name='title' type='text'>
-      Content<input name='content' type='text'>
-    </div>
-    <div>
-      Start Date<input name='start_date' type='date'>
-      End Date<input name='end_date' type='date'>
-    </div>
-    <div>
-      URL<input name='url' type='text'>
-      Host<input name='host' type='text'>
-    </div>
+    <table>
+      <tr>
+        <td class="item_name"><span>Title</span></td>
+        <td><input name='title' type='text'></td>
+        <td class="item_name right"><span>Content</span></td>
+        <td><input name='content' type='text'></td>
+      </tr>
+      <tr>
+        <td class="item_name"><span>Start Date</span></td>
+        <td><input name='start_date' type='date'></td>
+        <td class="item_name right"><span>End Date</span></td>
+        <td><input name='end_date' type='date'></td>
+      </tr>
+      <tr>
+        <td class="item_name"><span>URL</span></td>
+        <td><input name='url' type='text'></td>
+        <td class="item_name right"><span>Host</span></td>
+        <td><input name='host' type='text'></td>
+      </tr>
+    </table>
   </div>
 </form>
-<div class='results_count'>Totally <span></span> results.</div>
-<div class='results'>
+<div class='divider'></div>
+<div class='result_list_count'>Totally <span></span> results.</div>
+<div class='result_list'>
   <div class='result template'>
     <div class='result_title'><a target="_blank" href=''></a></div>
-    <div class='result_date'></div>
+    <div class='result_meta'>
+      <span class='result_date'></span>
+      <a class='result_cached'>Cached</a>
+      <a class='result_graph'>Graph</a>
+    </div>
     <div class='result_url'></div>
   </div>
 </div>
 <div class='paging'>
-<span class='page_previous'><a href='javascript:void(0)'>Previous</a></span>
-<span class='page template'></span>
-<span class='page_next'><a href='javascript:void(0)'>Next</a></span>
+<a class='page_previous'>Previous</a>
+<a class='page template'></a>
+<a class='page_next'>Next</a>
 </div>
 </body>
 </html>

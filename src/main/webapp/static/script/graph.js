@@ -4,17 +4,36 @@ var urldic = {};
 var index = 0;
 var graph;
 
-function FetchNode() {
-  var form = $('.graph_form');
-  var query = {};
-  query.url = form.find('[name=url]').val();
-  // console.log('Query', query);
-  _CleanResults();
-  $.getJSON(form.attr('action'), query).done(function(top_docs) {
-	  
+function ClickViewButton() {
+  var form = $('.search_form');
+  var url = form.find('input[name=url]').val();
+  location.search = $.param({'url': url});
+}
+
+$(document).ready(function() {
+  var url = $.query.get('url');
+
+  var form = $('.search_form');
+  form.find('input[name=url]').val(url);
+
+  if (url) {
+    _View(url);
+  }
+
+  form.find('input[name=text]').keypress(function(event) {
+    var code = (event.keyCode ? event.keyCode : event.which);
+    if (code == '13') {
+      ClickViewButton();
+    }
+  });
+});
+
+function _View(url) {
+  console.log('URL', url);
+  $.getJSON('/big-data-box/graph', {'url': url}).done(function(node_graph) {
+    // console.log('Result', node_graph);  
 	  graph = new _DrawGraph();
 	  _ModifyGraph(top_docs);
-
   }).fail(function(msg) {
     console.log(msg.statusText);
   });
@@ -102,7 +121,6 @@ function _DrawGraph(){
     .attr("height", height);
 
   	var defs = svg.append("defs");
-  	
   	var arrowMarker = defs.append("marker")
   		.attr("id","arrow")
   		.attr("markerUnits","strokeWidth")
@@ -138,7 +156,6 @@ function _DrawGraph(){
         .style("fill", function(d) { return color(d.group); })
         .call(force.drag);
 
-
   node.append("title")
     .text(function(d) { return d.nurl; });
 
@@ -155,9 +172,8 @@ function _DrawGraph(){
   });
   
   var update = function() {
-
       link = link.data(force.links());
-
+      
       link.enter()
       		.append("line")
       		.attr("class", "link")
@@ -172,12 +188,9 @@ function _DrawGraph(){
       		.attr("r", 8)
       		.style("fill", function(d) { return color(d.group); })
       		.call(force.drag);
-      
       node.append("title")
       .text(function(d) { return d.nurl; });
-
       node.exit().remove();
-
       force.start();
   };
   
@@ -188,16 +201,13 @@ function _FindNewLink(url){
 	  query.url = url;
 	  // console.log('Query', query);
 	  $.getJSON('/big-data-box/graph', query).done(function(top_docs) {
-		  
 		  _ModifyGraph(top_docs);
-
 	  }).fail(function(msg) {
 	    console.log(msg.statusText);
 	  });
 }
 
 function _ModifyGraph(top_docs){
-	
 	    graph.addNode(top_docs.node.normalized_url,top_docs.node.url);
 	    var k = _FindNode(top_docs.node.normalized_url);
 	    for(var i = 0; i < top_docs.in.length; i++) {
@@ -207,6 +217,5 @@ function _ModifyGraph(top_docs){
 	    for(var i = 0; i < top_docs.out.length; i++) {
 	    	graph.addNode(top_docs.out[i].normalized_url,top_docs.out[i].url);
 	    	graph.addLink(k,_FindNode(top_docs.out[i].normalized_url));
-	    }
-	
+	    }	
 }
