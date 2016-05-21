@@ -8,19 +8,19 @@
 </head>
 <body>
 <form class='search_form'>
-  <div>
-    Text<input name='text' type='text'>
+  <div class='search_main_field'>
+    <span>Text</span><input name='text' type='text'>
     <button type='button' onclick='ClickSearchButton()'>Search</button>
     <a href='javascript:void(0)' onclick='ToggleOptions()'>More/Less Options</a>
   </div>
   <div class='advanced_search_options'>
     <div>
-      Title<input name='title' type='text'>
-      Content<input name='content' type='text'>
+      <span>Title</span><input name='title' type='text'>
+      <span>Content</span><input name='content' type='text'>
     </div>
     <div>
-      Start Date<input name='start_date' type='date'>
-      End Date<input name='end_date' type='date'>
+      <span>Start Date</span><input name='start_date' type='date'>
+      <span>End Date</span><input name='end_date' type='date'>
     </div>
     <div>
       URL<input name='url' type='text'>
@@ -28,6 +28,7 @@
     </div>
   </div>
 </form>
+<div class='divider'></div>
 <div class='result_list_count'>Totally <span></span> results.</div>
 <div class='result_list'>
   <div class='result template'>
