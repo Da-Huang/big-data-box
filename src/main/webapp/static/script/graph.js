@@ -33,7 +33,7 @@ function _View(url) {
   $.getJSON('/big-data-box/graph', {'url': url}).done(function(node_graph) {
     // console.log('Result', node_graph);  
 	  graph = new _DrawGraph();
-	  _ModifyGraph(top_docs);
+	  _ModifyGraph(node_graph);
   }).fail(function(msg) {
     console.log(msg.statusText);
   });
