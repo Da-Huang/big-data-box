@@ -113,7 +113,6 @@
             <configuration>
               <url>https://code.jquery.com/jquery-2.2.3.min.js</url>
               <outputFileName>jquery.js</outputFileName>
-              <outputDirectory>${project.build.directory}/big-data-box/static/script</outputDirectory>
               <outputDirectory>${project.basedir}/src/main/webapp/static/script</outputDirectory>
             </configuration>
           </execution>
@@ -125,7 +124,19 @@
             </goals>
             <configuration>
               <url>https://github.com/d3/d3/releases/download/v3.5.17/d3.zip</url>
-              <outputFileName>d3.js.zip</outputFileName>
+              <outputFileName>d3.zip</outputFileName>
+              <outputDirectory>${project.build.directory}/zip</outputDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>install-jquery-plugin-query-object</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>wget</goal>
+            </goals>
+            <configuration>
+              <url>https://github.com/alrusdi/jquery-plugin-query-object/archive/master.zip</url>
+              <outputFileName>jquery-plugin-query-object.zip</outputFileName>
               <outputDirectory>${project.build.directory}/zip</outputDirectory>
             </configuration>
           </execution>
@@ -178,14 +189,26 @@
         <version>1.8</version>
         <executions>
           <execution>
-            <id>unzip-d3.js</id>
+            <id>unzip-d3</id>
             <phase>process-resources</phase>
             <goals>
               <goal>run</goal>
             </goals>
             <configuration>
               <target>
-                <unzip src="${project.build.directory}/zip/d3.js.zip" dest="${project.basedir}/src/main/webapp/static/script/d3"/>
+                <unzip src="${project.build.directory}/zip/d3.zip" dest="${project.basedir}/src/main/webapp/static/script/d3"/>
+              </target>
+            </configuration>
+          </execution>
+          <execution>
+            <id>unzip-jquery-plugin-query-object</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <unzip src="${project.build.directory}/zip/jquery-plugin-query-object.zip" dest="${project.basedir}/src/main/webapp/static/script"/>
               </target>
             </configuration>
           </execution>
