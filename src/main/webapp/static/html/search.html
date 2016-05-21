@@ -3,13 +3,14 @@
 <title>Search in the Box</title>
 <link rel='stylesheet' type='text/css' href='/big-data-box/static/css/search.css'>
 <script src='/big-data-box/static/script/jquery.js'></script>
+<script src='/big-data-box/static/script/jquery-plugin-query-object-master/jquery.query-object.js'></script>
 <script src='/big-data-box/static/script/search.js'></script>
 </head>
 <body>
-<form action='/big-data-box/search' class='search_form' method="get">
+<form class='search_form'>
   <div>
     Text<input name='text' type='text'>
-    <button type='button' onclick='Search(0, RESULTS_EACH_PAGE)'>Search</button>
+    <button type='button' onclick='ClickSearchButton()'>Search</button>
     <a href='javascript:void(0)' onclick='ToggleOptions()'>More/Less Options</a>
   </div>
   <div class='advanced_search_options'>

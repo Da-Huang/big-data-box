@@ -1,23 +1,58 @@
-const
-RESULTS_EACH_PAGE = 20;
 
-function Search(start, limit) {
+function ClickSearchButton() {
   var form = $('.search_form');
-  var query = _ParseQuery(form, start, limit);
+  var text = form.find('[name=text]').val();
+  var title = form.find('[name=title]').val();
+  var content = form.find('[name=content]').val();
+  var start_date = form.find('[name=start_date]').val();
+  var end_date = form.find('[name=end_date]').val();
+  var url = form.find('[name=url]').val();
+  var host = form.find('[name=host]').val();
+
+  var query =
+      _ParseQuery(text, title, content, start_date, end_date, url, host, 0, 20);
+  location.search = $.param(query);
+}
+
+$(document).ready(function() {
+  var text = $.query.get('text');
+  var title = $.query.get('title');
+  var content = $.query.get('content');
+  var start_date = $.query.get('start_date');
+  var end_date = $.query.get('end_date');
+  var url = $.query.get('url');
+  var host = $.query.get('host');
+  var start = $.query.get('start');
+  var limit = $.query.get('limit');
+
+  var form = $('.search_form');
+  form.find('[name=text]').val(text);
+  form.find('[name=title]').val(title);
+  form.find('[name=content]').val(content);
+  form.find('[name=start_date]').val(start_date);
+  form.find('[name=end_date]').val(end_date);
+  form.find('[name=url]').val(url);
+  form.find('[name=host]').val(host);
+  if (title || content || start_date || end_date || url || host) {
+    $('.advanced_search_options').show();
+  }
+
+  if (text || title || content || content || start_date || end_date || url ||
+      host) {
+    var query = _ParseQuery(text, title, content, start_date, end_date, url,
+                            host, start, limit);
+    _Search(query);
+  }
+});
+
+function _Search(query) {
   console.log('Query', query);
-  _CleanResults();
-  $.getJSON(form.attr('action'), query).done(function(top_docs) {
+  $.getJSON('/big-data-box/search', query).done(function(top_docs) {
     _RenderTopDocs(top_docs);
-    _RenderPaging(start, limit, top_docs.total_hits);
+    _RenderPaging(query.start, query.limit, top_docs.total_hits);
   }).fail(function(msg) {
     console.log(msg.statusText);
   });
-}
-
-function _CleanResults() {
-  $('.results_count').hide();
-  $('.result:not(.template)').remove();
-  $('.paging').hide();
 }
 
 function _RenderPaging(start, limit, total_hits) {
@@ -52,22 +87,16 @@ function _RenderTopDocs(top_docs) {
   $.each(top_docs.docs, function(i, doc) {
     var doc_node = $('.result.template').clone().removeClass('template');
     doc_node.find('.result_title>a').text(doc.title);
-    doc_node.find('.result_title>a').attr('href',
-        '/big-data-box/content/' + doc.doc_id);
+    doc_node.find('.result_title>a')
+        .attr('href', '/big-data-box/content/' + doc.doc_id);
     doc_node.find('.result_date').text(new Date(doc.date).toISOString());
     doc_node.find('.result_url').text(doc.url);
     doc_node.appendTo('.results').show();
   });
 }
 
-function _ParseQuery(form, start, limit) {
-  var text = form.find('[name=text]').val();
-  var title = form.find('[name=title]').val();
-  var content = form.find('[name=content]').val();
-  var start_date = form.find('[name=start_date]').val();
-  var end_date = form.find('[name=end_date]').val();
-  var url = form.find('[name=url]').val();
-  var host = form.find('[name=host]').val();
+function _ParseQuery(text, title, content, start_date, end_date, url, host,
+                     start, limit) {
   var query = {};
   if (text) {
     query.text = text;
