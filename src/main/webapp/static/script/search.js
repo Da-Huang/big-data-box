@@ -95,18 +95,22 @@ function _RenderPaging(start, limit, total_hits) {
 
 function _RenderTopDocs(top_docs) {
   console.log('Result', top_docs);
-  $('.results_count>span').text(top_docs.total_hits);
-  $('.results_count').show();
+  $('.result_list_count>span').text(top_docs.total_hits);
+  $('.result_list_count').show();
 
+  var result_template = $('.result.template');
   $.each(top_docs.docs, function(i, doc) {
-    var doc_node = $('.result.template').clone().removeClass('template');
+    var doc_node = result_template.clone().removeClass('template');
     doc_node.find('.result_title>a').text(doc.title);
-    doc_node.find('.result_title>a')
+    doc_node.find('.result_title>a').attr('href', doc.url);
+    doc_node.find('.result_cached')
         .attr('href', '/big-data-box/content/' + doc.doc_id);
+    doc_node.find('.result_graph')
+        .attr('href', '/big-data-box/graph?' + $.param({'url': doc.url}));
     doc_node.find('.result_date')
         .text(new Date(doc.date).toISOString().slice(0, 10));
     doc_node.find('.result_url').text(doc.url);
-    doc_node.appendTo('.results').show();
+    doc_node.appendTo('.result_list').show();
   });
 }
 
