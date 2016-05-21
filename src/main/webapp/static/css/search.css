@@ -12,16 +12,39 @@ body {
 
 .search_form {
   margin:20px;
+}
+
+.search_form * {
   font-size:large;
+}
+
+.search_main_field {
+  margin:0 30px;
 }
 
 .search_main_field * {
   margin:5px;
 }
 
+.search_main_field input {
+  width:400;
+}
+
 .advanced_search_options {
   margin:5px;
   display:none;
+}
+
+.advanced_search_options input {
+  width:200;
+}
+
+.advanced_search_options td.item_name {
+  text-align:right;
+}
+
+.advanced_search_options td.item_name.right>span {
+  margin-left:10px;
 }
 
 .divider {

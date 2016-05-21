@@ -1,13 +1,13 @@
 
 function ClickSearchButton() {
   var form = $('.search_form');
-  var text = form.find('[name=text]').val();
-  var title = form.find('[name=title]').val();
-  var content = form.find('[name=content]').val();
-  var start_date = form.find('[name=start_date]').val();
-  var end_date = form.find('[name=end_date]').val();
-  var url = form.find('[name=url]').val();
-  var host = form.find('[name=host]').val();
+  var text = form.find('input[name=text]').val();
+  var title = form.find('input[name=title]').val();
+  var content = form.find('input[name=content]').val();
+  var start_date = form.find('input[name=start_date]').val();
+  var end_date = form.find('input[name=end_date]').val();
+  var url = form.find('input[name=url]').val();
+  var host = form.find('input[name=host]').val();
 
   var query =
       _ParseQuery(text, title, content, start_date, end_date, url, host, 0, 20);
@@ -26,13 +26,13 @@ $(document).ready(function() {
   var limit = $.query.get('limit');
 
   var form = $('.search_form');
-  form.find('[name=text]').val(text);
-  form.find('[name=title]').val(title);
-  form.find('[name=content]').val(content);
+  form.find('input[name=text]').val(text);
+  form.find('input[name=title]').val(title);
+  form.find('input[name=content]').val(content);
   if (start_date) {
     try {
       start_date = new Date(start_date).toISOString().slice(0, 10);
-      form.find('[name=start_date]').val(start_date);
+      form.find('input[name=start_date]').val(start_date);
     } catch (e) {
       console.log(e);
     }
@@ -40,13 +40,13 @@ $(document).ready(function() {
   if (end_date) {
     try {
       end_date = new Date(end_date).toISOString().slice(0, 10);
-      form.find('[name=end_date]').val(end_date);
+      form.find('input[name=end_date]').val(end_date);
     } catch (e) {
       console.log(e);
     }
   }
-  form.find('[name=url]').val(url);
-  form.find('[name=host]').val(host);
+  form.find('input[name=url]').val(url);
+  form.find('input[name=host]').val(host);
   if (title || content || start_date || end_date || url || host) {
     $('.advanced_search_options').show();
   }

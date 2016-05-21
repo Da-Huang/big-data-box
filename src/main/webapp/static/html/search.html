@@ -14,18 +14,26 @@
     <a href='javascript:void(0)' onclick='ToggleOptions()'>More/Less Options</a>
   </div>
   <div class='advanced_search_options'>
-    <div>
-      <span>Title</span><input name='title' type='text'>
-      <span>Content</span><input name='content' type='text'>
-    </div>
-    <div>
-      <span>Start Date</span><input name='start_date' type='date'>
-      <span>End Date</span><input name='end_date' type='date'>
-    </div>
-    <div>
-      URL<input name='url' type='text'>
-      Host<input name='host' type='text'>
-    </div>
+    <table>
+      <tr>
+        <td class="item_name"><span>Title</span></td>
+        <td><input name='title' type='text'></td>
+        <td class="item_name right"><span>Content</span></td>
+        <td><input name='content' type='text'></td>
+      </tr>
+      <tr>
+        <td class="item_name"><span>Start Date</span></td>
+        <td><input name='start_date' type='date'></td>
+        <td class="item_name right"><span>End Date</span></td>
+        <td><input name='end_date' type='date'></td>
+      </tr>
+      <tr>
+        <td class="item_name"><span>URL</span></td>
+        <td><input name='url' type='text'></td>
+        <td class="item_name right"><span>Host</span></td>
+        <td><input name='host' type='text'></td>
+      </tr>
+    </table>
   </div>
 </form>
 <div class='divider'></div>
