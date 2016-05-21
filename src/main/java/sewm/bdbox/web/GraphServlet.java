@@ -1,6 +1,7 @@
 package sewm.bdbox.web;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -29,9 +30,10 @@ public class GraphServlet extends HttpServlet {
     }
     int limit = InfomallWebQueryUtil.parseLimit(req.getParameter("limit"));
 
-    Map<String, String> in = InfomallGraphUtil.fetchInUrls(
-        ContentServlet.DATA_MAP, WebSingleton.getInfomallSearcher(), url,
-        limit);
+    Map<String, String> in = req.getParameter("with_in") != null
+        ? InfomallGraphUtil.fetchInUrls(ContentServlet.DATA_MAP,
+            WebSingleton.getInfomallSearcher(), url, limit)
+        : new HashMap<>();
     Map<String, String> out = InfomallGraphUtil.fetchOutUrls(
         ContentServlet.DATA_MAP, WebSingleton.getInfomallSearcher(), url,
         limit);
