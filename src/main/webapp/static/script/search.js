@@ -29,8 +29,22 @@ $(document).ready(function() {
   form.find('[name=text]').val(text);
   form.find('[name=title]').val(title);
   form.find('[name=content]').val(content);
-  form.find('[name=start_date]').val(start_date);
-  form.find('[name=end_date]').val(end_date);
+  if (start_date) {
+    try {
+      start_date = new Date(start_date).toISOString().slice(0, 10);
+      form.find('[name=start_date]').val(start_date);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+  if (end_date) {
+    try {
+      end_date = new Date(end_date).toISOString().slice(0, 10);
+      form.find('[name=end_date]').val(end_date);
+    } catch (e) {
+      console.log(e);
+    }
+  }
   form.find('[name=url]').val(url);
   form.find('[name=host]').val(host);
   if (title || content || start_date || end_date || url || host) {
@@ -89,7 +103,8 @@ function _RenderTopDocs(top_docs) {
     doc_node.find('.result_title>a').text(doc.title);
     doc_node.find('.result_title>a')
         .attr('href', '/big-data-box/content/' + doc.doc_id);
-    doc_node.find('.result_date').text(new Date(doc.date).toISOString());
+    doc_node.find('.result_date')
+        .text(new Date(doc.date).toISOString().slice(0, 10));
     doc_node.find('.result_url').text(doc.url);
     doc_node.appendTo('.results').show();
   });
