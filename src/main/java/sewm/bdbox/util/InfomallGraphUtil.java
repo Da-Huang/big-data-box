@@ -23,12 +23,13 @@ public class InfomallGraphUtil {
    * @return Map of <Normalized URL, URL>.
    */
   public static Map<String, String> fetchInUrls(
-      final Map<String, String> dataMap, InfomallSearcher searcher,
-      String url) {
+      final Map<String, String> dataMap, InfomallSearcher searcher, String url,
+      int limit) {
     Map<String, String> ans = new HashMap<>();
     TopDocs top = searcher.search(
         new TermQuery(new Term("anchor_url", HtmlUtil.normalizeURL(url))),
-        Integer.MAX_VALUE);
+        limit * 2);
+    int count = 0;
     for (ScoreDoc scoreDoc : top.scoreDocs) {
       Document doc = searcher.doc(scoreDoc.doc);
       final String filename = doc.get("filename");
@@ -39,6 +40,9 @@ public class InfomallGraphUtil {
         String normalizedUrl = HtmlUtil.normalizeURL(infomallDoc.getUrl());
         if (!ans.containsKey(normalizedUrl)) {
           ans.put(normalizedUrl, infomallDoc.getUrl());
+          if (++count < limit) {
+            return ans;
+          }
         }
       }
     }
@@ -49,12 +53,13 @@ public class InfomallGraphUtil {
    * @return Map of <Normalized URL, URL>.
    */
   public static Map<String, String> fetchOutUrls(
-      final Map<String, String> dataMap, InfomallSearcher searcher,
-      String url) {
+      final Map<String, String> dataMap, InfomallSearcher searcher, String url,
+      int limit) {
     Map<String, String> ans = new HashMap<>();
     TopDocs top = searcher.search(
         new TermQuery(new Term("url", HtmlUtil.normalizeURL(url))),
         Integer.MAX_VALUE);
+    int count = 0;
     for (ScoreDoc scoreDoc : top.scoreDocs) {
       Document doc = searcher.doc(scoreDoc.doc);
       final String filename = doc.get("filename");
@@ -66,6 +71,9 @@ public class InfomallGraphUtil {
           String normalizedAnchorUrl = HtmlUtil.normalizeURL(anchor.getValue());
           if (!ans.containsKey(normalizedAnchorUrl)) {
             ans.put(normalizedAnchorUrl, anchor.getValue());
+            if (++count < limit) {
+              return ans;
+            }
           }
         }
       }
