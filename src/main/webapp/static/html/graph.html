@@ -1,32 +1,20 @@
 <html>
 <head>
 <title>Graph in the Box</title>
-<style>
-
-.node {
-  stroke: #fff;
-  stroke-width: 1.5px;
-}
-
-.link {
-  stroke: #999;
-  stroke-opacity: .6;
-}
-
-</style>
+<link rel='stylesheet' type='text/css' href='/big-data-box/static/css/search.css'>
+<link rel='stylesheet' type='text/css' href='/big-data-box/static/css/graph.css'>
 <script src='/big-data-box/static/script/jquery.js'></script>
 <script src='/big-data-box/static/script/jquery-plugin-query-object-master/jquery.query-object.js'></script>
 <script src='/big-data-box/static/script/graph.js'></script>
 <script src="/big-data-box/static/script/d3/d3.min.js"></script>
 </head>
 <body>
-<form action='/big-data-box/graph' class='graph_form' method="get">
-  <div>
-    URL<input name='url' type='text'>
+<form class='search_form'>
+  <div class='search_main_field'>
+    <span>URL</span><input name='url' type='text'>
     <button type='button' onclick='FetchNode()'>Search</button>
   </div>
 </form>
-
-
+<div class='divider'></div>
 </body>
 </html>
