@@ -28,7 +28,7 @@ public class InfomallGraphUtil {
     Map<String, String> ans = new HashMap<>();
     TopDocs top = searcher.search(
         new TermQuery(new Term("anchor_url", HtmlUtil.normalizeURL(url))),
-        limit * 2);
+        limit);
     int count = 0;
     for (ScoreDoc scoreDoc : top.scoreDocs) {
       Document doc = searcher.doc(scoreDoc.doc);
@@ -57,8 +57,7 @@ public class InfomallGraphUtil {
       int limit) {
     Map<String, String> ans = new HashMap<>();
     TopDocs top = searcher.search(
-        new TermQuery(new Term("url", HtmlUtil.normalizeURL(url))),
-        Integer.MAX_VALUE);
+        new TermQuery(new Term("url", HtmlUtil.normalizeURL(url))), limit);
     int count = 0;
     for (ScoreDoc scoreDoc : top.scoreDocs) {
       Document doc = searcher.doc(scoreDoc.doc);
