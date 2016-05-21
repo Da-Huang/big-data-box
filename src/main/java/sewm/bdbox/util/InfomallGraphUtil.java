@@ -40,7 +40,7 @@ public class InfomallGraphUtil {
         String normalizedUrl = HtmlUtil.normalizeURL(infomallDoc.getUrl());
         if (!ans.containsKey(normalizedUrl)) {
           ans.put(normalizedUrl, infomallDoc.getUrl());
-          if (++count < limit) {
+          if (++count >= limit) {
             return ans;
           }
         }
@@ -71,7 +71,7 @@ public class InfomallGraphUtil {
           String normalizedAnchorUrl = HtmlUtil.normalizeURL(anchor.getValue());
           if (!ans.containsKey(normalizedAnchorUrl)) {
             ans.put(normalizedAnchorUrl, anchor.getValue());
-            if (++count < limit) {
+            if (++count >= limit) {
               return ans;
             }
           }
