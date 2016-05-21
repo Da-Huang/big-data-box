@@ -1,33 +1,49 @@
 var dic = {};
 var group = 0;
 
-function FetchNode() {
-  var form = $('.graph_form');
-  var query = {};
-  query.url = form.find('[name=url]').val();
-  // console.log('Query', query);
-  _CleanResults();
-  $.getJSON(form.attr('action'), query).done(function(top_docs) {
-    // console.log('Result', top_docs);
+function ClickViewButton() {
+  var form = $('.search_form');
+  var url = form.find('input[name=url]').val();
+  location.search = $.param({'url': url});
+}
+
+$(document).ready(function() {
+  var url = $.query.get('url');
+
+  var form = $('.search_form');
+  form.find('input[name=url]').val(url);
+
+  if (url) {
+    _View(url);
+  }
+});
+
+function _View(url) {
+  console.log('URL', url);
+  $.getJSON('/big-data-box/graph', {'url': url}).done(function(node_graph) {
+    // console.log('Result', node_graph);
     var graphjson = new Object();
-    var centreNode = top_docs.node.normalized_url;
+    var centreNode = node_graph.node.normalized_url;
     var nodes = new Array();
     var links = new Array();
-    var nodeGroup = _AddDict(top_docs.node.url);
+    var nodeGroup = _AddDict(node_graph.node.url);
 
-    nodes[0] = {"name":top_docs.node.normalized_url,"group":nodeGroup};
+    nodes[0] = {
+      "name": node_graph.node.normalized_url,
+      "group": nodeGroup
+    };
     var k = 0;
-    for(var i = 0; i < top_docs.in.length; i++) {
-      var g = _AddDict(top_docs.in[i].url);
-      nodes.push({"name":top_docs.in[i].normalized_url,"group":g});
+    for (var i = 0; i < node_graph.in.length; i++) {
+      var g = _AddDict(node_graph.in[i].url);
+      nodes.push({"name": node_graph.in[i].normalized_url, "group": g});
       k++;
-      links.push({"source":k,"target":0,"value":5});
+      links.push({"source": k, "target": 0, "value": 5});
     }
-    for(var i = 0; i < top_docs.out.length; i++) {
-      var g = _AddDict(top_docs.out[i].url);
-      nodes.push({"name":top_docs.out[i].normalized_url,"group":g});
+    for (var i = 0; i < node_graph.out.length; i++) {
+      var g = _AddDict(node_graph.out[i].url);
+      nodes.push({"name": node_graph.out[i].normalized_url, "group": g});
       k++;
-      links.push({"source":0,"target":k,"value":10});
+      links.push({"source": 0, "target": k, "value": 10});
     }
     graphjson.nodes = nodes;
     graphjson.links = links;
@@ -76,10 +92,7 @@ function _DrawGraph(graph){
     .attr("width", width)
     .attr("height", height);
 
-  force
-        .nodes(graph.nodes)
-        .links(graph.links)
-        .start();
+  force.nodes(graph.nodes).links(graph.links).start();
 
   var link = svg.selectAll(".link")
         .data(graph.links)
