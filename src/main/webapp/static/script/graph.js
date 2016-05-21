@@ -16,6 +16,13 @@ $(document).ready(function() {
   if (url) {
     _View(url);
   }
+
+  form.find('input[name=text]').keypress(function(event) {
+    var code = (event.keyCode ? event.keyCode : event.which);
+    if (code == '13') {
+      ClickViewButton();
+    }
+  });
 });
 
 function _View(url) {
@@ -49,7 +56,6 @@ function _View(url) {
     graphjson.links = links;
     console.log('graph', graphjson);
     _DrawGraph(graphjson);
-
   }).fail(function(msg) {
     console.log(msg.statusText);
   });

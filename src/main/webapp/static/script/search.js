@@ -1,4 +1,3 @@
-
 function ClickSearchButton() {
   var form = $('.search_form');
   var text = form.find('input[name=text]').val();
@@ -33,16 +32,16 @@ $(document).ready(function() {
     try {
       start_date = new Date(start_date).toISOString().slice(0, 10);
       form.find('input[name=start_date]').val(start_date);
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log(err);
     }
   }
   if (end_date) {
     try {
       end_date = new Date(end_date).toISOString().slice(0, 10);
       form.find('input[name=end_date]').val(end_date);
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log(err);
     }
   }
   form.find('input[name=url]').val(url);
@@ -57,6 +56,13 @@ $(document).ready(function() {
                             host, start, limit);
     _Search(query);
   }
+
+  form.find('input[name=text]').keypress(function(event) {
+    var code = (event.keyCode ? event.keyCode : event.which);
+    if (code == '13') {
+      ClickSearchButton();
+    }
+  });
 });
 
 function _Search(query) {
