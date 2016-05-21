@@ -22,8 +22,9 @@ body {
   margin:0 30px;
 }
 
-.search_main_field * {
-  margin:5px;
+.search_main_field span {
+  margin-right:15px;
+  font-weight:bold;
 }
 
 .search_main_field input {
