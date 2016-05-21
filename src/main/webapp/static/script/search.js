@@ -63,34 +63,35 @@ function _Search(query) {
   console.log('Query', query);
   $.getJSON('/big-data-box/search', query).done(function(top_docs) {
     _RenderTopDocs(top_docs);
-    _RenderPaging(query.start, query.limit, top_docs.total_hits);
+    _RenderPaging(query, top_docs.total_hits);
   }).fail(function(msg) {
     console.log(msg.statusText);
   });
 }
 
-function _RenderPaging(start, limit, total_hits) {
-  /*
-  var num_pages_before = (start + limit - 1) / limit;
-  var num_pages_after = (total_hits - start - 1) / limit;
+function _RenderPaging(query, total_hits) {
+  var start = parseInt(query.start), limit = parseInt(query.limit);
+  var num_pages_before = Math.ceil(start / limit);
+  var num_pages_after = Math.ceil((total_hits - start - limit) / limit);
   if (num_pages_before == 0) {
     $('.page_previous').hide();
   } else {
-    $('.page_previous').show().onclick(function() {
-      var new_start = Math.max(start - limit, 0);
-      Search(new_start, limit);
-    });
+    query.start = Math.max(start - limit, 0);
+    $('.page_previous')
+        .show()
+        .attr('href',
+              '/big-data-box/static/html/search.html?' + $.param(query));
   }
   if (num_pages_after == 0) {
-    $('.page_after').hide();
+    $('.page_next').hide();
   } else {
-    $('.page_after').show().onclick(function() {
-      Search(start + limit, limit);
-    });
+    query.start = start + limit;
+    $('.page_next')
+        .show()
+        .attr('href',
+              '/big-data-box/static/html/search.html?' + $.param(query));
   }
-  var current_page = start / limit;
-  var left = current_page, right = current_page;
-  */
+  $('.paging').show();
 }
 
 function _RenderTopDocs(top_docs) {
@@ -106,7 +107,8 @@ function _RenderTopDocs(top_docs) {
     doc_node.find('.result_cached')
         .attr('href', '/big-data-box/content/' + doc.doc_id);
     doc_node.find('.result_graph')
-        .attr('href', '/big-data-box/graph?' + $.param({'url': doc.url}));
+        .attr('href', '/big-data-box/static/html/graph.html?' +
+                          $.param({'url': doc.url}));
     doc_node.find('.result_date')
         .text(new Date(doc.date).toISOString().slice(0, 10));
     doc_node.find('.result_url').text(doc.url);
