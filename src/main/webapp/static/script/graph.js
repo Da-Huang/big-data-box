@@ -86,6 +86,7 @@ function _DrawGraph(){
 			var k = _AddUrlDict(nurl);
 			var g = _AddHostDict(url);
 			nodes[k] = {"url":url,"nurl":nurl,"group":g};
+			update();
 		}
 	};
 	
@@ -98,7 +99,7 @@ function _DrawGraph(){
 			}
 		}
 		if(flag){
-			links.push({"source":source,"target":target,"value":2});
+			links.push({"source":source,"target":target,"value":5});
 			update();
 		}
 	};
@@ -110,7 +111,7 @@ function _DrawGraph(){
 
   var force = d3.layout.force()
       .charge(-150)  // 相互之间力的作用
-      .linkDistance(50)  // 制定连线长度
+      .linkDistance(150)  // 制定连线长度
       .size([width, height]);  // 作用域范围
   
   var nodes = force.nodes(),
@@ -121,21 +122,22 @@ function _DrawGraph(){
     .attr("height", height);
 
   	var defs = svg.append("defs");
+  	
   	var arrowMarker = defs.append("marker")
   		.attr("id","arrow")
-  		.attr("markerUnits","strokeWidth")
-  		.attr("markerWidth","12")
-  		.attr("markerHeight","12")
-  		.attr("viewBox","0 0 12 12") 
-  		.attr("refX","6")
+  		.attr("markerUnits","strokeWidth")   //标识大小的基准
+  		.attr("markerWidth","7")    //标识大小
+  		.attr("markerHeight","7")
+  		.attr("viewBox","0 0 10 10") //坐标系的区域
+  		.attr("refX","6")  //在viewBox内的基准点，绘制时此点在直线端点上
   		.attr("refY","6")
-  		.attr("orient","auto");
+  		.attr("orient","auto");  //绘制方向
   	
   	var arrow_path = "M2,2 L10,6 L2,10 L6,6 L2,2";
 	
   	arrowMarker.append("path")
   				.attr("d",arrow_path)
-  				.attr("fill","#000");
+  				.attr("fill","gray");
   
      force.start();
 
@@ -144,7 +146,7 @@ function _DrawGraph(){
         .enter()
         .append("line")
         .attr("class", "link")
-        .attr("mark-end","url#arrow")
+        .attr("marker-end","url(#arrow)")
         .style("stroke-width", function(d) { return Math.sqrt(d.value); });
 
   var node = svg.selectAll(".node")
@@ -152,7 +154,7 @@ function _DrawGraph(){
         .enter()
         .append("circle")
         .attr("class", "node")
-        .attr("r", 10)
+        .attr("r", 15)
         .style("fill", function(d) { return color(d.group); })
         .call(force.drag);
 
@@ -177,7 +179,7 @@ function _DrawGraph(){
       link.enter()
       		.append("line")
       		.attr("class", "link")
-      		.attr("mark-end","url#arrow")
+      		.attr("marker-end","url(#arrow)")
       		.style("stroke-width", function(d) { return Math.sqrt(d.value); });
       link.exit().remove();
 
@@ -185,7 +187,7 @@ function _DrawGraph(){
       node.enter()
       		.append("circle")
       		.attr("class", "node")
-      		.attr("r", 8)
+      		.attr("r", 15)
       		.style("fill", function(d) { return color(d.group); })
       		.call(force.drag);
       node.append("title")
