@@ -51,6 +51,12 @@ public class InfomallSearcher implements AutoCloseable {
     return new MultiReader(readers, true);
   }
 
+  /**
+   * Defined for ThreadedInfomallSearcher.
+   */
+  protected InfomallSearcher() {
+  }
+
   public InfomallSearcher(String... indexPaths) throws IOException {
     reader = openIndexReader(indexPaths);
     searcher = new IndexSearcher(reader);
