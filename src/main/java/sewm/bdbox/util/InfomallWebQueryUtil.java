@@ -146,13 +146,13 @@ public class InfomallWebQueryUtil {
 
   public static int parseLimit(String limit) {
     if (limit == null) {
-      return 20;
+      return 10;
     }
     try {
       return Integer.parseInt(limit);
     } catch (NumberFormatException e) {
       logger.error(e);
-      return 20;
+      return 10;
     }
   }
 }

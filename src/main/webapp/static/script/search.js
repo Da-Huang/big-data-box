@@ -9,7 +9,7 @@ function ClickSearchButton() {
   var host = form.find('input[name=host]').val();
 
   var query =
-      _ParseQuery(text, title, content, start_date, end_date, url, host, 0, 20);
+      _ParseQuery(text, title, content, start_date, end_date, url, host, 0, 10);
   location.search = $.param(query);
 }
 
