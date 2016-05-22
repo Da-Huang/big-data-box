@@ -29,7 +29,7 @@ $(document).ready(function() {
 });
 
 function _View(url) {
-  console.log('URL', url);
+	
   $.getJSON('/big-data-box/graph', {'url': url}).done(function(node_graph) {
     // console.log('Result', node_graph);  
 	  graph = new _DrawGraph();
@@ -47,9 +47,17 @@ function _CleanResults() {
 }
 
 function _AddHostDict(url){
+	console.log("url",url);
+	if(url[0] != 'h')
+	{
+		
+		url = "http://" + url;
+	}
 	var a = document.createElement('a');
     a.href = url;
     var host = a.hostname;
+    
+    console.log("host",host);
     if(host in hostdic){ 
       return hostdic[host];
     }
