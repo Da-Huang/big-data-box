@@ -13,13 +13,12 @@ import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.BoostQuery;
 import org.apache.lucene.search.IndexSearcher;
-// import org.apache.lucene.search.MultiSearcher;
-import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
@@ -33,16 +32,33 @@ public class InfomallSearcher implements AutoCloseable {
   private static final Logger logger = LogUtil
       .getLogger(InfomallSearcher.class);
 
-  private MultiReader reader = null;
-  private IndexSearcher searcher = null;
+  protected IndexReader reader = null;
+  protected IndexSearcher searcher = null;
 
-  public InfomallSearcher(String... indexPaths) throws IOException {
+  protected static IndexReader openIndexReader(String... indexPaths)
+      throws IOException {
+    if (indexPaths.length == 0) {
+      throw new IllegalArgumentException("No index path is provided.");
+    }
+    if (indexPaths.length == 1) {
+      return DirectoryReader.open(FSDirectory.open(Paths.get(indexPaths[0])));
+    }
     IndexReader[] readers = new IndexReader[indexPaths.length];
-    for (int i = 0; i < indexPaths.length; i++) {
+    for (int i = 0; i < indexPaths.length; ++i) {
       readers[i] = DirectoryReader
           .open(FSDirectory.open(Paths.get(indexPaths[i])));
     }
-    reader = new MultiReader(readers);
+    return new MultiReader(readers, true);
+  }
+
+  /**
+   * Defined for ThreadedInfomallSearcher.
+   */
+  protected InfomallSearcher() {
+  }
+
+  public InfomallSearcher(String... indexPaths) throws IOException {
+    reader = openIndexReader(indexPaths);
     searcher = new IndexSearcher(reader);
   }
 

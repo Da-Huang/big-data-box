@@ -1,2 +1,3 @@
-data_map = /media/d/infomall/data_map.txt
-index = /media/d/infomall/index0
+data_map = /Volumes/HPT8_56T/infomall-data/data_map.txt
+index = /Volumes/HPT8_56T/infomall-index-backup/index0;/Volumes/HPT8_56T/infomall-index-backup/index1;/Volumes/HPT8_56T/infomall-index-backup/index2
+threads = 4
