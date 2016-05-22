@@ -6,6 +6,7 @@ import java.util.Properties;
 import org.apache.logging.log4j.Logger;
 
 import sewm.bdbox.search.InfomallSearcher;
+import sewm.bdbox.search.ThreadedInfomallSearcher;
 import sewm.bdbox.util.LogUtil;
 
 class WebSingleton {
@@ -33,11 +34,13 @@ class WebSingleton {
   private static InfomallSearcher infomallSearcher = null;
 
   static InfomallSearcher getInfomallSearcher() {
+    int threads = Integer.parseInt(getProperties().getProperty("threads", "1"));
+
     if (infomallSearcher == null) {
       synchronized (InfomallSearcher.class) {
         if (infomallSearcher == null) {
           try {
-            infomallSearcher = new InfomallSearcher(
+            infomallSearcher = new ThreadedInfomallSearcher(threads,
                 getProperties().getProperty("index").split(";"));
           } catch (IOException e) {
             LogUtil.error(logger, e);
