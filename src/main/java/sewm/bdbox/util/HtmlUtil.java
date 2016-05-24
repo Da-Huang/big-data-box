@@ -104,6 +104,8 @@ public class HtmlUtil {
   // Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 
   public static String extractCleanHtml(String html) {
+    // Removed most spaces first to make it faster.
+    html = html.replaceAll("\\s\\s+", " ");
     html = html.replaceAll("\\s+>", ">");
     html = html.replaceAll("(?is)<head.*?</head>", " ");
     html = html.replaceAll("(?is)<script.*?</script>", " ");
@@ -135,7 +137,7 @@ public class HtmlUtil {
     // Removes tags with at least 2 characters.
     html = html.replaceAll("(?s)<\\w\\w.*?>", " ");
     html = html.replaceAll("</\\w\\w+?>", " ");
-    html = html.replaceAll("\\s+", " ");
+    html = html.replaceAll("\\s\\s+", " ");
     return html;
   }
 
