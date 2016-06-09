@@ -127,13 +127,13 @@ public class ThreadedInfomallIndexer extends InfomallIndexer {
     }
 
     try (InfomallIndexer indexer = builder.build()) {
-      indexer.index(line.getOptionValue("data"));
-      indexer.onCloseWriteIgnoredCollections(ignoredCollectionsFile);
       Signal.handle(new Signal("INT"), new SignalHandler() {
         public void handle(Signal sig) {
           indexer.stop();
         }
       });
+      indexer.index(line.getOptionValue("data"));
+      indexer.onCloseWriteIgnoredCollections(ignoredCollectionsFile);
     } catch (IOException e) {
       LogUtil.error(logger, e);
     }
