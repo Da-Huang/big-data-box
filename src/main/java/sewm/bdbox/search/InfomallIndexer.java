@@ -159,7 +159,9 @@ public class InfomallIndexer implements AutoCloseable {
               HtmlUtil.normalizeURL(anchor.getValue()), Field.Store.NO));
         }
       }
-      writer.addDocument(doc);
+      synchronized (this) {
+        writer.addDocument(doc);
+      }
       return true;
     } catch (IOException e) {
       LogUtil.error(logger, e);
