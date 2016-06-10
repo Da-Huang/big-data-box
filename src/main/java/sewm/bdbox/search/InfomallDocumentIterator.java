@@ -122,6 +122,9 @@ public class InfomallDocumentIterator {
       StreamUtil.readLine(is);
 
       byte[] unzipBytes = JZlipUtil.decompress(bytes);
+      if (unzipBytes == null) {
+        unzipBytes = new byte[0];
+      }
       String charset = HtmlUtil.pCharset(detector, unzipBytes);
       String html = new String(unzipBytes, charset);
 

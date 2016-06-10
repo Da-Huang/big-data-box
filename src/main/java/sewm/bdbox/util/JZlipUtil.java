@@ -15,6 +15,9 @@ public class JZlipUtil {
     try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
       while (!inflater.finished()) {
         int count = inflater.inflate(buffer);
+        if (count == 0) {
+          throw new Exception("Failed to unzip, due to count == 0.");
+        }
         outputStream.write(buffer, 0, count);
       }
       byte[] output = outputStream.toByteArray();
