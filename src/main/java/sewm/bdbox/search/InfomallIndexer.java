@@ -8,9 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -46,10 +44,10 @@ public class InfomallIndexer implements AutoCloseable {
   protected static final String INFOMALL_COLLECTION_PREFIX = "Web_Raw.";
 
   private Directory dir = null;
-  protected IndexWriter writer = null;
+  private IndexWriter writer = null;
   protected Set<String> ignoredCollections = null;
+  private Path ignoredCollectionsFile = null;
 
-  private List<Runnable> onCloseActions = new ArrayList<Runnable>();
   private boolean stop = false;
 
   protected InfomallIndexer(Builder builder) throws IOException {
@@ -61,6 +59,7 @@ public class InfomallIndexer implements AutoCloseable {
     dir = FSDirectory.open(Paths.get(builder.indexPath));
     writer = new IndexWriter(dir, iwc);
     ignoredCollections = builder.ignoredCollections;
+    ignoredCollectionsFile = builder.ignoredCollectionsFile;
   }
 
   public boolean index(String dataPath) {
@@ -100,9 +99,17 @@ public class InfomallIndexer implements AutoCloseable {
       int numDocs = writer.numDocs();
       boolean success = indexDocCollection(file);
       if (success) {
-        logger.info("Processed " + file.getFileName() + "["
-            + (writer.numDocs() - numDocs) + "], and ignore it.");
-        ignoredCollections.add(file.getFileName().toString());
+        try {
+          writer.commit();
+          logger.info("Processed " + file.getFileName() + "["
+              + (writer.numDocs() - numDocs) + "], and ignore it.");
+          synchronized (this) {
+            ignoredCollections.add(file.getFileName().toString());
+            Files.write(ignoredCollectionsFile, ignoredCollections);
+          }
+        } catch (IOException e) {
+          LogUtil.error(logger, e);
+        }
       } else {
         logger.info("Failed to process " + file.getFileName() + ".");
       }
@@ -167,32 +174,6 @@ public class InfomallIndexer implements AutoCloseable {
     }
   }
 
-  /**
-   * This function is not thread-safe.
-   */
-  public void onCloseWriteIgnoredCollections(String ignoredCollectionsFile) {
-    onCloseWriteIgnoredCollections(Paths.get(ignoredCollectionsFile));
-  }
-
-  /**
-   * This function is not thread-safe.
-   */
-  public void onCloseWriteIgnoredCollections(Path ignoredCollections) {
-    onCloseActions.add(new Runnable() {
-      @Override
-      public void run() {
-        logger.info("On-close Action: writing ignoredCollections("
-            + InfomallIndexer.this.ignoredCollections.size() + ").");
-        try {
-          Files.write(ignoredCollections,
-              InfomallIndexer.this.ignoredCollections);
-        } catch (IOException e) {
-          LogUtil.error(logger, e);
-        }
-      }
-    });
-  }
-
   public void stop() {
     stop = true;
     logger.info("Stoping this writer.");
@@ -201,10 +182,6 @@ public class InfomallIndexer implements AutoCloseable {
   @Override
   public void close() throws IOException {
     logger.info("Totally " + writer.numDocs() + " documents has been indexed.");
-    logger.info("Doing on-close actions(" + onCloseActions.size() + ").");
-    for (Runnable action : onCloseActions) {
-      action.run();
-    }
     logger.info("Closing this writer.");
     if (writer != null) {
       writer.close();
@@ -219,6 +196,7 @@ public class InfomallIndexer implements AutoCloseable {
     private String indexPath;
     private double bufferSizeMB = 2048;
     private Set<String> ignoredCollections = new HashSet<String>();
+    private Path ignoredCollectionsFile;
     private boolean create = false;
 
     public Builder indexPath(String indexPath) {
@@ -228,11 +206,6 @@ public class InfomallIndexer implements AutoCloseable {
 
     public Builder bufferSizeMB(double bufferSizeMB) {
       this.bufferSizeMB = bufferSizeMB;
-      return this;
-    }
-
-    public Builder ignoreCollections(Set<String> ignoredCollections) {
-      this.ignoredCollections = ignoredCollections;
       return this;
     }
 
@@ -246,10 +219,11 @@ public class InfomallIndexer implements AutoCloseable {
       return this;
     }
 
-    public Builder ignoreCollections(String ignoredCollectionsFile) {
+    public Builder ignoreCollectionsFile(String ignoredCollectionsFile) {
       try {
+        this.ignoredCollectionsFile = Paths.get(ignoredCollectionsFile);
         this.ignoredCollections = new HashSet<String>(
-            Files.readAllLines(Paths.get(ignoredCollectionsFile)));
+            Files.readAllLines(this.ignoredCollectionsFile));
         logger.info("Loaded " + this.ignoredCollections.size()
             + " ignored collections from " + ignoredCollectionsFile);
       } catch (IOException e) {
@@ -304,7 +278,7 @@ public class InfomallIndexer implements AutoCloseable {
         "ignored_collections.txt");
     InfomallIndexer.Builder builder = InfomallIndexer.builder()
         .indexPath(line.getOptionValue("index"))
-        .ignoreCollections(ignoredCollectionsFile)
+        .ignoreCollectionsFile(ignoredCollectionsFile)
         .create(line.hasOption("create"));
 
     if (line.hasOption("buffer_mb")) {
@@ -313,7 +287,6 @@ public class InfomallIndexer implements AutoCloseable {
 
     try (InfomallIndexer indexer = builder.build()) {
       indexer.index(line.getOptionValue("data"));
-      indexer.onCloseWriteIgnoredCollections(ignoredCollectionsFile);
       Signal.handle(new Signal("INT"), new SignalHandler() {
         public void handle(Signal sig) {
           indexer.stop();

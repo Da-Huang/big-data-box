@@ -115,7 +115,7 @@ public class ThreadedInfomallIndexer extends InfomallIndexer {
         "ignored_collections.txt");
     InfomallIndexer.Builder builder = ThreadedInfomallIndexer.builder()
         .indexPath(line.getOptionValue("index"))
-        .ignoreCollections(ignoredCollectionsFile)
+        .ignoreCollectionsFile(ignoredCollectionsFile)
         .create(line.hasOption("create"));
 
     if (line.hasOption("buffer_mb")) {
@@ -133,7 +133,6 @@ public class ThreadedInfomallIndexer extends InfomallIndexer {
         }
       });
       indexer.index(line.getOptionValue("data"));
-      indexer.onCloseWriteIgnoredCollections(ignoredCollectionsFile);
     } catch (IOException e) {
       LogUtil.error(logger, e);
     }
